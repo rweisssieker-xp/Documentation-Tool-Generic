@@ -46,6 +46,14 @@ class DocumentTemplate:
         return {
             'name': 'Standard',
             'description': 'Standard-Dokumentvorlage',
+            'metadata': {
+                'author': 'Auto-generiert',
+                'version': '1.0',
+                'organization': 'Unbekannt',
+                'department': 'Unbekannt',
+                'project': 'Dokumentation',
+                'document_id': ''
+            },
             'structure': {
                 'include_title_page': True,
                 'include_table_of_contents': True,
@@ -53,34 +61,101 @@ class DocumentTemplate:
                 'include_steps': True,
                 'include_conclusion': True,
                 'include_security_notes': True,
-                'include_troubleshooting': False
+                'include_troubleshooting': False,
+                'include_appendices': False,
+                'include_glossary': False,
+                'include_revision_history': False
             },
             'formatting': {
                 'title_font_size': 24,
                 'heading_font_size': 18,
+                'subheading_font_size': 14,
                 'body_font_size': 11,
+                'font_family': 'Calibri',
+                'heading_font_family': 'Calibri Bold',
                 'margin_top': 1.0,
                 'margin_bottom': 1.0,
                 'margin_left': 1.0,
-                'margin_right': 1.0
+                'margin_right': 1.0,
+                'line_spacing': 1.15,
+                'paragraph_spacing_after': 6,
+                'color_scheme': {
+                    'primary': '2E74B5',
+                    'secondary': '5B9BD5',
+                    'accent': '70AD47',
+                    'text': '000000',
+                    'background': 'FFFFFF'
+                }
             },
             'sections': {
+                'title_page': {
+                    'title': 'Dokumentation',
+                    'subtitle': 'Automatisch generiertes Handbuch',
+                    'include_logo': False,
+                    'logo_path': '',
+                    'include_date': True,
+                    'include_author': True
+                },
                 'introduction': {
                     'title': 'Einleitung',
-                    'level': 1
+                    'level': 1,
+                    'include_purpose': True,
+                    'include_scope': True,
+                    'include_prerequisites': False
+                },
+                'steps': {
+                    'title': 'Schritt-für-Schritt Anleitung',
+                    'include_step_numbering': True,
+                    'include_window_title': True,
+                    'include_timestamp': False,
+                    'include_screenshot_caption': True,
+                    'screenshot_alignment': 'center',
+                    'screenshot_size': 'medium'  # small, medium, large, original
                 },
                 'conclusion': {
                     'title': 'Fazit',
-                    'level': 1
+                    'level': 1,
+                    'include_summary': True,
+                    'include_next_steps': True
                 },
                 'security_notes': {
                     'title': 'Sicherheitshinweise',
-                    'level': 1
+                    'level': 1,
+                    'include_general_security': True,
+                    'include_process_specific': True,
+                    'include_best_practices': True
                 },
                 'troubleshooting': {
                     'title': 'Fehlerbehebung',
+                    'level': 1,
+                    'include_common_issues': True,
+                    'include_solutions': True
+                },
+                'appendices': {
+                    'title': 'Anhang',
                     'level': 1
+                },
+                'glossary': {
+                    'title': 'Glossar',
+                    'level': 1
+                },
+                'revision_history': {
+                    'title': 'Änderungshistorie',
+                    'level': 1,
+                    'include_version': True,
+                    'include_date': True,
+                    'include_author': True,
+                    'include_changes': True
                 }
+            },
+            'export_options': {
+                'include_latex': False,
+                'include_pdf': True,
+                'include_docx': True,
+                'include_html': False,
+                'include_markdown': False,
+                'include_json_audit': True,
+                'include_csv_audit': False
             }
         }
     

@@ -3,7 +3,7 @@ Template-Engine für konfigurierbare Dokumentstruktur
 """
 
 from pathlib import Path
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Callable
 from datetime import datetime
 import os
 import hashlib
@@ -12,11 +12,15 @@ from src.document.docx_builder import DOCXBuilder
 from src.document.pdf_exporter import PDFExporter
 from src.document.markdown_exporter import MarkdownExporter
 from src.document.html_exporter import HTMLExporter
+from src.document.latex_exporter import LaTeXExporter
 from src.document.template_manager import TemplateManager, DocumentTemplate
 from src.ai.text_generator import TextGenerator
 from src.audit.audit_logger import AuditLogger
+from src.capture.annotation_engine import AnnotationEngine
+from src.capture.ui_element_detector import UIElementDetector
 from pathlib import Path
 import yaml
+import os
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -53,6 +57,25 @@ class TemplateEngine:
         # Initialisiere Komponenten
         self.text_generator = TextGenerator(self.session_info['prompt_profile'])
         self.pdf_exporter = PDFExporter()
+        
+        # Lade Annotation-Einstellungen
+        auto_annotations = os.getenv('AUTO_ANNOTATIONS', 'false').lower() == 'true'
+        annotation_style = os.getenv('ANNOTATION_STYLE', 'modern')
+        ui_element_detection = os.getenv('UI_ELEMENT_DETECTION', 'false').lower() == 'true'
+        
+        self.auto_annotations = auto_annotations
+        self.annotation_style = annotation_style
+        self.ui_element_detection = ui_element_detection
+        
+        if auto_annotations:
+            self.annotation_engine = AnnotationEngine(style=annotation_style)
+        else:
+            self.annotation_engine = None
+        
+        if ui_element_detection:
+            self.ui_element_detector = UIElementDetector()
+        else:
+            self.ui_element_detector = None
     
     def generate_document(
         self,
@@ -61,7 +84,8 @@ class TemplateEngine:
         include_security_notes: bool = True,
         include_troubleshooting: bool = False,
         include_screenshots: bool = True,
-        export_formats: Optional[Dict[str, bool]] = None
+        export_formats: Optional[Dict[str, bool]] = None,
+        progress_callback: Optional[Callable[[float, str], None]] = None
     ) -> Path:
         """
         Generiert das vollständige Dokument
@@ -69,10 +93,11 @@ class TemplateEngine:
         Args:
             include_introduction: Ob Einleitung eingefügt werden soll
             include_conclusion: Ob Fazit eingefügt werden soll
-            include_security_notes: Ob Sicherheitshinweise eingefügt werden sollen
+            include_security_notes: Ob Sicherheitshinweise eingefügt werden soll
             include_troubleshooting: Ob Troubleshooting eingefügt werden soll
             include_screenshots: Ob Screenshots eingefügt werden sollen
             export_formats: Dictionary mit Export-Format-Optionen (docx, pdf, markdown, html, json, csv)
+            progress_callback: Optionaler Callback für Fortschrittsanzeige (Wert 0-100, Status-Text)
             
         Returns:
             Pfad zur erstellten DOCX-Datei
@@ -83,9 +108,16 @@ class TemplateEngine:
         if not steps:
             raise ValueError("Keine Schritte zum Dokumentieren vorhanden!")
         
+        # Melde Fortschritt falls Callback vorhanden
+        if progress_callback:
+            progress_callback(5, "Lade Schritte...")
+        
         # Generiere Beschreibungen für alle Schritte
         logger.info("Generiere Beschreibungen für alle Schritte...")
-        steps_with_descriptions = self.text_generator.generate_all_step_descriptions(steps)
+        steps_with_descriptions = self.text_generator.generate_all_step_descriptions(steps, progress_callback)
+        
+        if progress_callback:
+            progress_callback(20, "Generiere Beschreibungen...")
         
         # Verwende Vorlagen-Struktur falls verfügbar
         if self.document_template:
@@ -107,11 +139,13 @@ class TemplateEngine:
         
         # Erstelle DOCX-Builder
         title = f"Handbuch - {self.session_info['session_id']}"
+        template_config = self.document_template.config if self.document_template else {}
         docx_builder = DOCXBuilder(
             title=title,
             author=os.getenv('USERNAME', 'Unbekannt'),
             version="1.0",
-            metadata=document_metadata
+            metadata=document_metadata,
+            template_config=template_config
         )
         
         # Wende Formatierung aus Vorlage an falls verfügbar
@@ -133,22 +167,37 @@ class TemplateEngine:
         # Einleitung
         if include_introduction:
             logger.info("Generiere Einleitung...")
+            if progress_callback:
+                progress_callback(30, "Generiere Einleitung...")
             introduction = self.text_generator.generate_introduction(steps_with_descriptions)
             docx_builder.add_introduction(introduction)
         
+        # Wende Annotationen auf Screenshots an falls aktiviert
+        if include_screenshots and (self.auto_annotations or self.ui_element_detection):
+            logger.info("Wende Annotationen auf Screenshots an...")
+            if progress_callback:
+                progress_callback(35, "Wende Annotationen auf Screenshots an...")
+            steps_with_descriptions = self._apply_annotations_to_steps(steps_with_descriptions)
+        
         # Schritte
         logger.info("Füge Schritte zum Dokument hinzu...")
+        if progress_callback:
+            progress_callback(40, "Füge Schritte hinzu...")
         docx_builder.add_steps(steps_with_descriptions, include_screenshots)
         
         # Fazit
         if include_conclusion:
             logger.info("Generiere Fazit...")
+            if progress_callback:
+                progress_callback(70, "Generiere Fazit...")
             conclusion = self.text_generator.generate_conclusion(steps_with_descriptions)
             docx_builder.add_conclusion(conclusion)
         
         # Sicherheitshinweise
         if include_security_notes:
             logger.info("Generiere Sicherheitshinweise...")
+            if progress_callback:
+                progress_callback(75, "Generiere Sicherheitshinweise...")
             security_notes = self.text_generator.generate_security_notes(steps_with_descriptions)
             if security_notes:
                 docx_builder.add_security_notes(security_notes)
@@ -156,6 +205,8 @@ class TemplateEngine:
         # Troubleshooting (optional)
         if include_troubleshooting:
             logger.info("Generiere Troubleshooting...")
+            if progress_callback:
+                progress_callback(80, "Generiere Troubleshooting...")
             troubleshooting_items = self.text_generator.generate_troubleshooting(steps_with_descriptions)
             if troubleshooting_items:
                 docx_builder.add_troubleshooting(troubleshooting_items)
@@ -166,7 +217,8 @@ class TemplateEngine:
                 'docx': True,
                 'pdf': True,
                 'markdown': False,
-                'html': False
+                'html': False,
+                'latex': False
             }
         
         # Speichere DOCX
@@ -178,17 +230,41 @@ class TemplateEngine:
             docx_path = self.output_dir / docx_filename
             
             logger.info(f"Speichere Dokument: {docx_path}")
+            if progress_callback:
+                progress_callback(85, "Speichere DOCX-Dokument...")
             docx_builder.save(docx_path)
+        
+        # Anzahl der Exportformate bestimmen für Fortschrittsberechnung
+        export_count = sum([
+            1 if export_formats.get('pdf', True) and docx_path else 0,
+            1 if export_formats.get('markdown', False) else 0,
+            1 if export_formats.get('html', False) else 0,
+            1 if export_formats.get('latex', False) else 0
+        ])
+        audit_export_count = sum([
+            1 if export_formats.get('json', True) else 0,
+            1 if export_formats.get('csv', False) else 0
+        ])
+        total_export_steps = export_count + audit_export_count
+        export_progress_start = 90
+        export_progress_increment = 0
+        if total_export_steps > 0:
+            export_progress_increment = (100 - export_progress_start) / total_export_steps
+        
+        current_progress = export_progress_start
         
         # Exportiere als PDF falls gewünscht
         pdf_path = None
         if export_formats.get('pdf', True) and self.pdf_exporter.is_available() and docx_path:
             try:
                 logger.info("Exportiere als PDF...")
+                if progress_callback:
+                    progress_callback(current_progress, "Exportiere als PDF...")
                 pdf_filename = f"{output_filename}.pdf"
                 pdf_path = self.output_dir / pdf_filename
                 self.pdf_exporter.export(docx_path, pdf_path)
                 logger.info(f"PDF erstellt: {pdf_path}")
+                current_progress += export_progress_increment
             except Exception as e:
                 logger.warning(f"PDF-Export fehlgeschlagen: {e}", exc_info=True)
         
@@ -196,6 +272,8 @@ class TemplateEngine:
         if export_formats.get('markdown', False):
             try:
                 logger.info("Exportiere als Markdown...")
+                if progress_callback:
+                    progress_callback(current_progress, "Exportiere als Markdown...")
                 markdown_exporter = MarkdownExporter()
                 markdown_filename = f"{output_filename}.md"
                 markdown_path = self.output_dir / markdown_filename
@@ -210,6 +288,7 @@ class TemplateEngine:
                     include_screenshots=include_screenshots
                 )
                 logger.info(f"Markdown erstellt: {markdown_path}")
+                current_progress += export_progress_increment
             except Exception as e:
                 logger.warning(f"Markdown-Export fehlgeschlagen: {e}", exc_info=True)
         
@@ -217,6 +296,8 @@ class TemplateEngine:
         if export_formats.get('html', False):
             try:
                 logger.info("Exportiere als HTML...")
+                if progress_callback:
+                    progress_callback(current_progress, "Exportiere als HTML...")
                 html_exporter = HTMLExporter()
                 html_filename = f"{output_filename}.html"
                 html_path = self.output_dir / html_filename
@@ -231,21 +312,51 @@ class TemplateEngine:
                     include_screenshots=include_screenshots
                 )
                 logger.info(f"HTML erstellt: {html_path}")
+                current_progress += export_progress_increment
             except Exception as e:
                 logger.warning(f"HTML-Export fehlgeschlagen: {e}", exc_info=True)
+        
+        # Exportiere als LaTeX falls gewünscht
+        if export_formats.get('latex', False):
+            try:
+                logger.info("Exportiere als LaTeX...")
+                if progress_callback:
+                    progress_callback(current_progress, "Exportiere als LaTeX...")
+                latex_exporter = LaTeXExporter()
+                latex_filename = f"{output_filename}.tex"
+                latex_path = self.output_dir / latex_filename
+                
+                latex_exporter.export(
+                    steps=steps_with_descriptions,
+                    output_path=latex_path,
+                    title=title,
+                    author=os.getenv('USERNAME', 'Unbekannt'),
+                    introduction=introduction if include_introduction else None,
+                    conclusion=conclusion if include_conclusion else None,
+                    include_screenshots=include_screenshots
+                )
+                logger.info(f"LaTeX erstellt: {latex_path}")
+                current_progress += export_progress_increment
+            except Exception as e:
+                logger.warning(f"LaTeX-Export fehlgeschlagen: {e}", exc_info=True)
         
         # Exportiere Audit-Trail
         audit_logger = self.session_manager.get_audit_logger()
         
         try:
             logger.info("Exportiere Audit-Trail...")
+            if progress_callback:
+                progress_callback(current_progress, "Erstelle Audit-Trail...")
+                
             if export_formats.get('json', True):
                 audit_json_path = audit_logger.export_json()
                 logger.info(f"Audit-Trail (JSON) erstellt: {audit_json_path}")
+                current_progress += export_progress_increment / 2  # Teile den Increment durch 2 weil 2 Audit-Formate
             
             if export_formats.get('csv', False):
                 audit_csv_path = audit_logger.export_csv()
                 logger.info(f"Audit-Trail (CSV) erstellt: {audit_csv_path}")
+                current_progress += export_progress_increment / 2  # Teile den Increment durch 2 weil 2 Audit-Formate
         except Exception as e:
             logger.warning(f"Audit-Trail-Export fehlgeschlagen: {e}", exc_info=True)
         
@@ -262,6 +373,66 @@ class TemplateEngine:
             # Werfe keine Exception, aber logge Warnung
         
         return docx_path or pdf_path or self.output_dir / f"{output_filename}.docx"
+    
+    def _apply_annotations_to_steps(self, steps: List[Dict]) -> List[Dict]:
+        """
+        Wendet Annotationen auf Screenshots an
+        
+        Args:
+            steps: Liste von Schritten mit Screenshots
+            
+        Returns:
+            Liste von Schritten mit annotierten Screenshots
+        """
+        annotated_steps = []
+        
+        for step in steps:
+            screenshot_path = Path(step.get('screenshot_path', ''))
+            
+            if not screenshot_path.exists():
+                annotated_steps.append(step)
+                continue
+            
+            # Erstelle temporären annotierten Screenshot
+            annotated_path = screenshot_path.parent / f"{screenshot_path.stem}_annotated{screenshot_path.suffix}"
+            
+            try:
+                # UI-Element-Erkennung falls aktiviert
+                annotations = []
+                if self.ui_element_detector:
+                    elements = self.ui_element_detector.detect_elements(screenshot_path)
+                    for element in elements:
+                        bbox = element.get('bbox', {})
+                        annotations.append({
+                            'type': 'box',
+                            'x': bbox.get('x', 0),
+                            'y': bbox.get('y', 0),
+                            'width': bbox.get('width', 0),
+                            'height': bbox.get('height', 0),
+                            'label': f"{element.get('type', 'element')}"
+                        })
+                
+                # Wende Annotationen an falls aktiviert
+                if self.annotation_engine and annotations:
+                    self.annotation_engine.annotate_screenshot(
+                        image_path=screenshot_path,
+                        output_path=annotated_path,
+                        annotations=annotations,
+                        auto_detect=self.auto_annotations
+                    )
+                    
+                    # Aktualisiere Screenshot-Pfad im Schritt
+                    step_copy = step.copy()
+                    step_copy['screenshot_path'] = str(annotated_path)
+                    annotated_steps.append(step_copy)
+                else:
+                    annotated_steps.append(step)
+            
+            except Exception as e:
+                logger.warning(f"Fehler beim Annotieren von Screenshot {screenshot_path}: {e}", exc_info=True)
+                annotated_steps.append(step)
+        
+        return annotated_steps
     
     def validate_export(
         self,

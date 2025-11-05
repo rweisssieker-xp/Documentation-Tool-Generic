@@ -4,7 +4,7 @@ Prompt-Template-System
 
 import yaml
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from src.config.config_manager import ConfigManager
 
 

@@ -7,11 +7,25 @@ from tkinter import ttk, messagebox
 from pathlib import Path
 import os
 from datetime import datetime
+from typing import Dict, List
 import threading
 
 from src.gui.settings_dialog import SettingsDialog
 from src.gui.preview_panel import PreviewPanel
 from src.gui.recovery_dialog import SessionRecoveryDialog
+from src.gui.batch_dialog import BatchDialog
+from src.gui.export_filter_dialog import ExportFilterDialog
+from src.gui.stats_dashboard import StatisticsDashboard
+from src.gui.multilang_export_dialog import MultiLangExportDialog
+from src.gui.cloud_upload_dialog import CloudUploadDialog
+from src.gui.quickref_export_dialog import QuickRefExportDialog
+from src.gui.video_export_dialog import VideoExportDialog
+from src.gui.consolidation_dialog import ConsolidationDialog
+from src.gui.session_compare_dialog import SessionCompareDialog
+from src.gui.test_checklist_dialog import TestChecklistDialog
+from src.gui.app_selector_dialog import AppSelectorDialog
+from src.gui.exploration_progress_dialog import ExplorationProgressDialog
+from src.gui.progress_dialog import ProgressDialog
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -68,6 +82,17 @@ class MainWindow:
         session_menu.add_separator()
         session_menu.add_command(label="Session wiederherstellen...", command=self._show_recovery_dialog)
         
+        # Export-Menü
+        export_menu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="Export", menu=export_menu)
+        export_menu.add_command(label="Multi-Sprach-Export...", command=self._show_multilang_export)
+        export_menu.add_command(label="Cloud-Upload...", command=self._show_cloud_upload)
+        export_menu.add_command(label="Quick-Reference...", command=self._show_quickref_export)
+        export_menu.add_command(label="Video-Export...", command=self._show_video_export)
+        export_menu.add_command(label="Platform-Export...", command=self._show_platform_export)
+        export_menu.add_separator()
+        export_menu.add_command(label="Export-Filter...", command=self._show_export_filter_dialog)
+        
         # Hilfe-Menü
         help_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="Hilfe", menu=help_menu)
@@ -78,6 +103,21 @@ class MainWindow:
         tools_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="Tools", menu=tools_menu)
         tools_menu.add_command(label="Bereinigung ausführen...", command=self._run_manual_cleanup)
+        tools_menu.add_separator()
+        tools_menu.add_command(label="Batch-Verarbeitung...", command=self._show_batch_dialog)
+        tools_menu.add_command(label="Statistiken...", command=self._show_stats_dashboard)
+        tools_menu.add_separator()
+        tools_menu.add_command(label="Schritt-Konsolidierung...", command=self._show_consolidation_dialog)
+        tools_menu.add_command(label="Session-Vergleich...", command=self._show_session_compare)
+        tools_menu.add_command(label="Test-Checkliste generieren...", command=self._show_test_checklist)
+        tools_menu.add_command(label="Qualitätsprüfung...", command=self._show_quality_check)
+        tools_menu.add_separator()
+        tools_menu.add_command(label="Export-Filter...", command=self._show_export_filter_dialog)
+        
+        # Automatisierung-Menü
+        automation_menu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="Automatisierung", menu=automation_menu)
+        automation_menu.add_command(label="App erkunden...", command=self._start_automated_exploration)
     
     def _show_shortcuts(self):
         """Zeigt Dialog mit Tastenkürzeln"""
@@ -89,11 +129,30 @@ Session-Steuerung:
   Ctrl+Shift+S        - Session beenden
   Ctrl+P              - Pause/Fortsetzen
   ESC                 - Session beenden (wenn aktiv)
+  Space               - Pause/Fortsetzen (je nach Zustand)
+  Enter               - Bestätigen/Starten (je nach Zustand)
 
 Bearbeitung:
   Ctrl+Z              - Rückgängig (Undo)
   Ctrl+Y              - Wiederholen (Redo)
   Ctrl+Shift+Z        - Wiederholen (Redo, alternativ)
+  Ctrl+R              - Schritt-Konsolidierung
+  Ctrl+E              - Export-Filter öffnen
+
+Navigation:
+  Ctrl+M              - Statistiken öffnen
+  Ctrl+T              - Qualitätsprüfung öffnen
+  Ctrl+O              - Session wiederherstellen
+  F2                  - Batch-Verarbeitung öffnen
+  F3                  - Session-Vergleich öffnen
+  F4                  - Test-Checkliste öffnen
+  F5                  - Vorschau aktualisieren
+  Ctrl+H              - Diese Hilfe öffnen
+
+Funktionen:
+  Ctrl+D              - Bereinigung ausführen
+  Ctrl+Q              - Anwendung beenden
+  Ctrl+Shift+P        - Vorschau-Sichtbarkeit umschalten
 
 Allgemein:
   F1                  - Einstellungen öffnen
@@ -146,6 +205,52 @@ Für weitere Informationen siehe README.md
         
         # ESC: Session beenden (wenn aktiv)
         self.root.bind('<Escape>', lambda e: self._stop_session() if self.session_active else None)
+        
+        # Weitere Tastenkürzel für häufige Aktionen
+        # Ctrl+O: Session wiederherstellen
+        self.root.bind('<Control-o>', lambda e: self._show_recovery_dialog())
+        
+        # Ctrl+M: Statistiken öffnen
+        self.root.bind('<Control-m>', lambda e: self._show_stats_dashboard())
+        
+        # Ctrl+T: Qualitätsprüfung öffnen
+        self.root.bind('<Control-t>', lambda e: self._show_quality_check())
+        
+        # Ctrl+E: Export-Filter öffnen
+        self.root.bind('<Control-e>', lambda e: self._show_export_filter_dialog())
+        
+        # F2: Batch-Verarbeitung öffnen
+        self.root.bind('<F2>', lambda e: self._show_batch_dialog())
+        
+        # F3: Session-Vergleich öffnen
+        self.root.bind('<F3>', lambda e: self._show_session_compare())
+        
+        # F4: Test-Checkliste öffnen
+        self.root.bind('<F4>', lambda e: self._show_test_checklist())
+        
+        # F5: Aktualisierung/Neuladen der Vorschau
+        self.root.bind('<F5>', lambda e: self._refresh_preview())
+        
+        # Ctrl+D: Bereinigung ausführen
+        self.root.bind('<Control-d>', lambda e: self._run_manual_cleanup())
+        
+        # Ctrl+H: Hilfe öffnen (Tastenkürzel-Ansicht)
+        self.root.bind('<Control-h>', lambda e: self._show_shortcuts())
+        
+        # Ctrl+R: Schritt-Konsolidierung öffnen
+        self.root.bind('<Control-r>', lambda e: self._show_consolidation_dialog())
+        
+        # Ctrl+Q: Anwendung beenden
+        self.root.bind('<Control-q>', lambda e: self.root.quit())
+        
+        # Enter: Bestätigen/OK in aktueller Situation
+        self.root.bind('<Return>', lambda e: self._handle_enter_key())
+        
+        # Space: Pause/Weiter je nach aktuellem Zustand
+        self.root.bind('<space>', lambda e: self._handle_space_key())
+        
+        # Strg+Shift+P: Screenshot-Preview umschalten (falls implementiert)
+        self.root.bind('<Control-Shift-P>', lambda e: self._toggle_preview())
     
     def _setup_ui(self):
         """Erstellt die UI-Komponenten"""
@@ -228,7 +333,7 @@ Für weitere Informationen siehe README.md
         
         # Preview-Panel
         self.preview_panel = PreviewPanel(main_frame)
-        self.preview_panel.grid(row=1, column=0, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S))
+        self.preview_panel.main_frame.grid(row=1, column=0, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S))
         
         # Infobereich am unteren Rand
         info_frame = ttk.Frame(main_frame)
@@ -339,8 +444,16 @@ Für weitere Informationen siehe README.md
             )
             self.preview_panel.clear()
             
+            # Setze Callbacks für Preview-Panel
+            self.preview_panel.set_delete_callback(self._delete_step_from_session)
+            self.preview_panel.set_reorder_callback(self._reorder_steps)
+            
         except Exception as e:
-            messagebox.showerror("Fehler", f"Fehler beim Starten der Session:\n{str(e)}")
+            logger.error(f"Fehler beim Starten der Session: {str(e)}", exc_info=True)
+            messagebox.showerror(
+                "Fehler", 
+                f"Fehler beim Starten der Session:\n\n{str(e)}\n\nDetails finden Sie in der Logdatei unter 'logs/ahg.log'."
+            )
     
     def _run_session(self):
         """Führt die Session aus (in separatem Thread)"""
@@ -382,9 +495,27 @@ Für weitere Informationen siehe README.md
             if self.session_manager:
                 self.session_manager.stop()
                 
+                # Frage nach Filter VOR dem Thread (im Hauptthread)
+                steps = self.session_manager.get_steps()
+                filtered_steps = steps
+                apply_filter = False
+                
+                if steps:
+                    apply_filter = messagebox.askyesno(
+                        "Export-Filter",
+                        "Möchten Sie einen Export-Filter anwenden?\n\n"
+                        "Sie können Schritte nach Datum, Fenster-Titel oder Schritt-Indizes filtern."
+                    )
+                    
+                    if apply_filter:
+                        filter_dialog = ExportFilterDialog(self.root, steps)
+                        self.root.wait_window(filter_dialog.dialog)
+                        filtered_steps = filter_dialog.get_filtered_steps()
+                
                 # Generiere Dokumente (in separatem Thread)
                 threading.Thread(
                     target=self._generate_documents,
+                    args=(filtered_steps, apply_filter),
                     daemon=True
                 ).start()
             
@@ -401,53 +532,168 @@ Für weitere Informationen siehe README.md
             )
             
         except Exception as e:
-            messagebox.showerror("Fehler", f"Fehler beim Beenden der Session:\n{str(e)}")
+            logger.error(f"Fehler beim Beenden der Session: {str(e)}", exc_info=True)
+            messagebox.showerror(
+                "Fehler", 
+                f"Fehler beim Beenden der Session:\n\n{str(e)}\n\nDetails finden Sie in der Logdatei unter 'logs/ahg.log'."
+            )
     
-    def _generate_documents(self):
+    def _generate_documents(self, filtered_steps: List[Dict] = None, applied_filter: bool = False):
         """Generiert die Dokumente nach Session-Ende"""
         try:
-            if self.session_manager:
-                # Generiere Dokumente
-                from src.document.template_engine import TemplateEngine
+            if not self.session_manager:
+                self.root.after(0, lambda: messagebox.showerror(
+                    "Fehler",
+                    "Keine Session vorhanden."
+                ))
+                return
+            
+            steps = filtered_steps if filtered_steps else self.session_manager.get_steps()
+            
+            if not steps:
+                self.root.after(0, lambda: messagebox.showwarning(
+                    "Keine Schritte",
+                    "Es sind keine Schritte vorhanden. Dokument kann nicht generiert werden."
+                ))
+                return
+            
+            # Temporär gefilterte Schritte setzen
+            original_steps = None
+            if applied_filter and filtered_steps != self.session_manager.get_steps():
+                original_steps = self.session_manager.steps.copy()
+                with self.session_manager.lock:
+                    self.session_manager.steps = filtered_steps.copy()
+            
+            # Erstelle Fortschrittsdialog
+            progress_dialog = ProgressDialog(
+                self.root,
+                title="Dokumente werden generiert...",
+                max_value=100,
+                show_percentage=True,
+                cancellable=True
+            )
+            
+            # Callback für Abbruch
+            def cancel_callback():
+                logger.info("Dokumentgenerierung wurde abgebrochen")
+                # Hier könnte man eine Abbruchvariable setzen
+            
+            progress_dialog.set_cancel_callback(cancel_callback)
+            
+            # Starte Generierung in separatem Thread mit Fortschrittsanzeige
+            def generate_with_progress():
+                try:
+                    # Simuliere Fortschritt für verschiedene Phasen
+                    total_phases = 4  # 1. Initialisierung, 2. Textgenerierung, 3. Export, 4. Abschluss
+                    phase_progress = 100 / total_phases
+                    
+                    # Phase 1: Initialisierung
+                    progress_dialog.update_progress(0, "Initialisiere Dokumentenerstellung...")
+                    from src.document.template_engine import TemplateEngine
+                    
+                    template_engine = TemplateEngine(
+                        self.session_manager,
+                        template_name=self.current_template
+                    )
+                    
+                    if progress_dialog.is_cancelled():
+                        return
+                    
+                    # Phase 2: Lade Export-Formate
+                    progress_dialog.update_progress(
+                        phase_progress, 
+                        "Lade Export-Konfiguration..."
+                    )
+                    from pathlib import Path
+                    import yaml
+                    export_config_path = Path("config") / "export_formats.yml"
+                    export_formats = {
+                        'docx': True,
+                        'pdf': True,
+                        'markdown': False,
+                        'html': False,
+                        'json': True,
+                        'csv': False,
+                        'latex': False  # Hinzugefügt für LaTeX-Export
+                    }
+                    
+                    if export_config_path.exists():
+                        try:
+                            with open(export_config_path, 'r', encoding='utf-8') as f:
+                                export_config = yaml.safe_load(f)
+                                export_formats.update(export_config or {})
+                        except Exception:
+                            pass
+                    
+                    if progress_dialog.is_cancelled():
+                        return
+                    
+                    # Phase 3: Generiere Dokumente
+                    progress_dialog.update_progress(
+                        phase_progress * 2, 
+                        "Generiere Dokumente (dies kann einige Minuten dauern)..."
+                    )
+                    output_path = template_engine.generate_document(export_formats=export_formats)
+                    
+                    if progress_dialog.is_cancelled():
+                        return
+                    
+                    # Phase 4: Qualitätsprüfung und Abschluss
+                    progress_dialog.update_progress(
+                        phase_progress * 3, 
+                        "Führe Qualitätsprüfung durch..."
+                    )
+                    
+                    # Stelle originale Schritte wieder her
+                    if original_steps is not None:
+                        with self.session_manager.lock:
+                            self.session_manager.steps = original_steps
+                    
+                    # Optionale Qualitätsprüfung
+                    from src.document.quality_checker import QualityChecker
+                    quality_checker = QualityChecker()
+                    quality_metrics = quality_checker.check_quality(steps)
+                    
+                    logger.info(f"Dokument erfolgreich generiert: {output_path}")
+                    
+                    # Update UI
+                    self.root.after(0, lambda: progress_dialog.close())
+                    self.root.after(0, lambda: self._on_documents_generated(output_path, quality_metrics))
                 
-                template_engine = TemplateEngine(
-                    self.session_manager,
-                    template_name=self.current_template
-                )
-                
-                # Lade Export-Formate aus Config
-                export_formats = {
-                    'docx': True,
-                    'pdf': True,
-                    'markdown': False,
-                    'html': False,
-                    'json': True,
-                    'csv': False
-                }
-                
-                from pathlib import Path
-                import yaml
-                export_config_path = Path("config") / "export_formats.yml"
-                if export_config_path.exists():
-                    try:
-                        with open(export_config_path, 'r', encoding='utf-8') as f:
-                            export_config = yaml.safe_load(f)
-                            export_formats.update(export_config or {})
-                    except Exception:
-                        pass
-                
-                output_path = template_engine.generate_document(export_formats=export_formats)
-                
-                # Update UI
-                self.root.after(0, lambda: self._on_documents_generated(output_path))
+                except Exception as e:
+                    import traceback
+                    error_msg = f"Fehler bei der Dokumentgenerierung:\n{str(e)}\n\n{traceback.format_exc()}"
+                    logger.error(error_msg, exc_info=True)
+                    
+                    # Schließe Dialog und zeige Fehlermeldung
+                    self.root.after(0, lambda: progress_dialog.close())
+                    self.root.after(0, lambda: messagebox.showerror(
+                        "Fehler",
+                        f"Fehler bei der Dokumentgenerierung:\n{str(e)}\n\nÜberprüfen Sie die Logs für Details."
+                    ))
+            
+            # Starte Thread für Generierung
+            generation_thread = threading.Thread(target=generate_with_progress, daemon=True)
+            generation_thread.start()
         
+        except ValueError as e:
+            # Spezifische Behandlung für ValueError (z.B. keine Schritte)
+            error_msg = str(e)
+            logger.warning(f"Dokumentgenerierung abgebrochen: {error_msg}")
+            messagebox.showwarning(
+                "Keine Schritte",
+                f"{error_msg}\n\nBitte starten Sie eine Session und erfassen Sie mindestens einen Schritt."
+            )
         except Exception as e:
-            self.root.after(0, lambda: messagebox.showerror(
+            import traceback
+            error_msg = f"Fehler bei der Dokumentgenerierung:\n{str(e)}\n\n{traceback.format_exc()}"
+            logger.error(error_msg, exc_info=True)
+            messagebox.showerror(
                 "Fehler",
-                f"Fehler bei der Dokumentgenerierung:\n{str(e)}"
-            ))
+                f"Fehler bei der Dokumentgenerierung:\n{str(e)}\n\nÜberprüfen Sie die Logs für Details."
+            )
     
-    def _on_documents_generated(self, output_path: Path):
+    def _on_documents_generated(self, output_path: Path, quality_metrics: Dict = None):
         """Callback nach erfolgreicher Dokumentgenerierung"""
         self._update_status("Bereit", "green")
         
@@ -465,6 +711,14 @@ Für weitere Informationen siehe README.md
                 f"- Schritte/Minute: {stats.get('average_steps_per_minute', 0):.1f}\n\n"
                 f"Dokument: {output_path}"
             )
+            
+            # Füge Qualitäts-Score hinzu falls verfügbar
+            if quality_metrics:
+                score = quality_metrics.get('overall_score', 0.0)
+                stats_text += f"\n\nQualitäts-Score: {score:.1%}"
+                if score < 0.7:
+                    stats_text += "\n⚠️ Empfehlung: Qualitätsprüfung ausführen für Verbesserungsvorschläge"
+            
             self.info_label.config(text=stats_text, foreground="green")
             messagebox.showinfo("Erfolg", stats_text)
         else:
@@ -570,6 +824,41 @@ Für weitere Informationen siehe README.md
         
         logger.info(f"Schritt {index + 1} gelöscht")
     
+    def _reorder_steps(self, from_index: int, to_index: int):
+        """
+        Ändert die Reihenfolge von Schritten
+        
+        Args:
+            from_index: Ursprünglicher Index
+            to_index: Neuer Index
+        """
+        if not self.session_manager:
+            return
+        
+        steps = self.session_manager.get_steps()
+        if from_index >= len(steps) or to_index >= len(steps):
+            return
+        
+        # Speichere History für Undo
+        self.session_manager._save_history_state()
+        
+        # Verschiebe Schritt
+        with self.session_manager.lock:
+            step = self.session_manager.steps.pop(from_index)
+            self.session_manager.steps.insert(to_index, step)
+            
+            # Aktualisiere Schritt-Nummern
+            for i, s in enumerate(self.session_manager.steps, start=1):
+                s['step_number'] = i
+        
+        # Aktualisiere UI
+        steps = self.session_manager.get_steps()
+        self.preview_panel.update_steps(steps)
+        self._update_undo_redo_buttons()
+        self._update_session_status()
+        
+        logger.info(f"Schritt {from_index + 1} nach Position {to_index + 1} verschoben")
+    
     def _show_recovery_dialog(self):
         """Zeigt Dialog zur Session-Wiederherstellung"""
         if self.session_active:
@@ -602,6 +891,10 @@ Für weitere Informationen siehe README.md
             self.preview_panel.update_steps(steps)
             self._update_undo_redo_buttons()
             self._update_session_status()
+            
+            # Setze Callbacks für Preview-Panel
+            self.preview_panel.set_delete_callback(self._delete_step_from_session)
+            self.preview_panel.set_reorder_callback(self._reorder_steps)
             
             logger.info(f"Session UI aktualisiert: {session_manager.session_id}")
     
@@ -657,7 +950,321 @@ Für weitere Informationen siehe README.md
         
         except Exception as e:
             logger.error(f"Fehler bei manueller Bereinigung: {e}", exc_info=True)
-            messagebox.showerror("Fehler", f"Fehler bei der Bereinigung:\n{str(e)}")
+            messagebox.showerror(
+                "Fehler", 
+                f"Fehler bei der Bereinigung:\n\n{str(e)}\n\nDetails finden Sie in der Logdatei unter 'logs/ahg.log'."
+            )
+    
+    def _show_batch_dialog(self):
+        """Zeigt Dialog zur Batch-Verarbeitung"""
+        dialog = BatchDialog(self.root)
+        self.root.wait_window(dialog.dialog)
+    
+    def _show_stats_dashboard(self):
+        """Zeigt Statistiken-Dashboard"""
+        dashboard = StatisticsDashboard(self.root)
+        # Aktualisiere Qualitäts-Metriken wenn Session aktiv
+        if self.session_manager and self.session_active:
+            steps = self.session_manager.get_steps()
+            dashboard.update_quality_metrics(steps)
+        self.root.wait_window(dashboard.dialog)
+    
+    def _show_export_filter_dialog(self):
+        """Zeigt Export-Filter-Dialog"""
+        if not self.session_manager or not self.session_active:
+            messagebox.showinfo(
+                "Keine Session",
+                "Bitte starten Sie zuerst eine Session oder stellen Sie eine wieder her."
+            )
+            return
+        
+        steps = self.session_manager.get_steps()
+        if not steps:
+            messagebox.showinfo(
+                "Keine Schritte",
+                "Es sind noch keine Schritte vorhanden."
+            )
+            return
+        
+        dialog = ExportFilterDialog(self.root, steps)
+        self.root.wait_window(dialog.dialog)
+    
+    def _show_multilang_export(self):
+        """Zeigt Multi-Sprach-Export Dialog"""
+        if not self.session_manager:
+            messagebox.showwarning("Keine Session", "Bitte starten Sie zuerst eine Session.")
+            return
+        
+        steps = self.session_manager.get_steps()
+        if not steps:
+            messagebox.showwarning("Keine Schritte", "Es sind keine Schritte vorhanden.")
+            return
+        
+        session_id = self.session_manager.session_id if self.session_manager else "unknown"
+        dialog = MultiLangExportDialog(self.root, steps, session_id)
+        self.root.wait_window(dialog.dialog)
+    
+    def _show_cloud_upload(self):
+        """Zeigt Cloud-Upload Dialog"""
+        # Frage nach Dateien zum Hochladen
+        from tkinter import filedialog
+        
+        file_paths = filedialog.askopenfilenames(
+            title="Dateien für Cloud-Upload auswählen",
+            filetypes=[
+                ("Alle Dokumente", "*.docx;*.pdf;*.md;*.html"),
+                ("Word-Dokumente", "*.docx"),
+                ("PDF-Dateien", "*.pdf"),
+                ("Markdown-Dateien", "*.md"),
+                ("HTML-Dateien", "*.html"),
+                ("Alle Dateien", "*.*")
+            ]
+        )
+        
+        if not file_paths:
+            return
+        
+        file_paths = [Path(f) for f in file_paths]
+        dialog = CloudUploadDialog(self.root, file_paths)
+        self.root.wait_window(dialog.dialog)
+    
+    def _show_quickref_export(self):
+        """Zeigt Quick-Reference Export Dialog"""
+        if not self.session_manager:
+            messagebox.showwarning("Keine Session", "Bitte starten Sie zuerst eine Session.")
+            return
+        
+        steps = self.session_manager.get_steps()
+        if not steps:
+            messagebox.showwarning("Keine Schritte", "Es sind keine Schritte vorhanden.")
+            return
+        
+        dialog = QuickRefExportDialog(self.root, steps)
+        self.root.wait_window(dialog.dialog)
+    
+    def _show_video_export(self):
+        """Zeigt Video-Export Dialog"""
+        if not self.session_manager:
+            messagebox.showwarning("Keine Session", "Bitte starten Sie zuerst eine Session.")
+            return
+        
+        steps = self.session_manager.get_steps()
+        if not steps:
+            messagebox.showwarning("Keine Schritte", "Es sind keine Schritte vorhanden.")
+            return
+        
+        dialog = VideoExportDialog(self.root, steps)
+        self.root.wait_window(dialog.dialog)
+    
+    def _show_platform_export(self):
+        """Zeigt Platform-Export Dialog"""
+        if not self.session_manager:
+            messagebox.showwarning("Keine Session", "Bitte starten Sie zuerst eine Session.")
+            return
+        
+        steps = self.session_manager.get_steps()
+        if not steps:
+            messagebox.showwarning("Keine Schritte", "Es sind keine Schritte vorhanden.")
+            return
+        
+        dialog = PlatformExportDialog(self.root, steps)
+        self.root.wait_window(dialog.dialog)
+    
+    def _show_consolidation_dialog(self):
+        """Zeigt Schritt-Konsolidierung Dialog"""
+        if not self.session_manager:
+            messagebox.showwarning("Keine Session", "Bitte starten Sie zuerst eine Session.")
+            return
+        
+        steps = self.session_manager.get_steps()
+        if not steps:
+            messagebox.showwarning("Keine Schritte", "Es sind keine Schritte vorhanden.")
+            return
+        
+        if len(steps) < 2:
+            messagebox.showinfo("Info", "Mindestens 2 Schritte erforderlich für Konsolidierung.")
+            return
+        
+        dialog = ConsolidationDialog(self.root, steps, self.session_manager)
+        self.root.wait_window(dialog.dialog)
+        
+        # Aktualisiere UI nach Konsolidierung
+        if self.session_manager:
+            updated_steps = self.session_manager.get_steps()
+            self.preview_panel.update_steps(updated_steps)
+            self._update_session_status()
+    
+    def _show_session_compare(self):
+        """Zeigt Session-Vergleich Dialog"""
+        dialog = SessionCompareDialog(self.root)
+        self.root.wait_window(dialog.dialog)
+    
+    def _show_test_checklist(self):
+        """Zeigt Test-Checkliste Generator Dialog"""
+        if not self.session_manager:
+            messagebox.showwarning("Keine Session", "Bitte starten Sie zuerst eine Session.")
+            return
+        
+        steps = self.session_manager.get_steps()
+        if not steps:
+            messagebox.showwarning("Keine Schritte", "Es sind keine Schritte vorhanden.")
+            return
+        
+        dialog = TestChecklistDialog(self.root, steps)
+        self.root.wait_window(dialog.dialog)
+    
+    def _show_quality_check(self):
+        """Zeigt Qualitätsprüfung Dialog"""
+        if not self.session_manager:
+            messagebox.showwarning("Keine Session", "Bitte starten Sie zuerst eine Session.")
+            return
+        
+        steps = self.session_manager.get_steps()
+        if not steps:
+            messagebox.showwarning("Keine Schritte", "Es sind keine Schritte vorhanden.")
+            return
+        
+        from src.document.quality_checker import QualityChecker
+        
+        quality_checker = QualityChecker()
+        metrics = quality_checker.check_quality(steps)
+        
+        # Zeige Qualitätsbericht
+        report = quality_checker.get_quality_report(steps)
+        
+        # Öffne Dialog mit Bericht
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Qualitätsprüfung")
+        dialog.geometry("700x600")
+        dialog.transient(self.root)
+        
+        # Zentriere Dialog
+        dialog.update_idletasks()
+        x = (dialog.winfo_screenwidth() // 2) - (dialog.winfo_width() // 2)
+        y = (dialog.winfo_screenheight() // 2) - (dialog.winfo_height() // 2)
+        dialog.geometry(f"+{x}+{y}")
+        
+        main_frame = ttk.Frame(dialog, padding="10")
+        main_frame.pack(fill=tk.BOTH, expand=True)
+        
+        # Score-Anzeige
+        score_frame = ttk.LabelFrame(main_frame, text="Gesamt-Qualitäts-Score", padding="10")
+        score_frame.pack(fill=tk.X, pady=(0, 10))
+        
+        score = metrics.get('overall_score', 0.0)
+        score_label = ttk.Label(
+            score_frame,
+            text=f"{score:.1%}",
+            font=("Arial", 24, "bold"),
+            foreground="green" if score >= 0.8 else "orange" if score >= 0.6 else "red"
+        )
+        score_label.pack()
+        
+        # Bericht
+        report_frame = ttk.LabelFrame(main_frame, text="Qualitätsbericht", padding="10")
+        report_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+        
+        scrollbar = ttk.Scrollbar(report_frame)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        report_text = tk.Text(
+            report_frame,
+            wrap=tk.WORD,
+            state=tk.DISABLED,
+            yscrollcommand=scrollbar.set
+        )
+        report_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.config(command=report_text.yview)
+        
+        report_text.config(state=tk.NORMAL)
+        report_text.insert(1.0, report)
+        report_text.config(state=tk.DISABLED)
+        
+        # Buttons
+        button_frame = ttk.Frame(main_frame)
+        button_frame.pack(fill=tk.X)
+        
+        ttk.Button(
+            button_frame,
+            text="Schließen",
+            command=dialog.destroy
+        ).pack(side=tk.RIGHT)
+    
+    def _start_automated_exploration(self):
+        """Startet automatische App-Erkundung"""
+        # Öffne App-Selector Dialog
+        app_dialog = AppSelectorDialog(self.root)
+        self.root.wait_window(app_dialog.dialog)
+        
+        selected_window = app_dialog.get_selected_window()
+        
+        if not selected_window:
+            return
+        
+        # Bestätigung
+        if not messagebox.askyesno(
+            "Automatische Erkundung",
+            f"Automatische Erkundung für '{selected_window.get('title', 'Unbekannt')}' starten?\n\n"
+            "Die App wird automatisch durchklickt und dokumentiert.\n"
+            "Dies kann einige Zeit dauern."
+        ):
+            return
+        
+        # Starte Session falls nicht aktiv
+        if not self.session_active:
+            self._start_session()
+            if not self.session_active:
+                return
+        
+        # Lade Exploration Config
+        import yaml
+        config_path = Path("config") / "exploration_config.yml"
+        config = {}
+        if config_path.exists():
+            try:
+                with open(config_path, 'r', encoding='utf-8') as f:
+                    config = yaml.safe_load(f) or {}
+            except Exception as e:
+                logger.error(f"Fehler beim Laden der Exploration Config: {e}")
+        
+        # Starte Exploration Session
+        try:
+            from src.automation.exploration_session import ExplorationSession
+            
+            exploration_session = ExplorationSession(
+                window_info=selected_window,
+                session_manager=self.session_manager,
+                config=config
+            )
+            
+            # Zeige Progress Dialog
+            progress_dialog = ExplorationProgressDialog(self.root, exploration_session)
+            
+            # Starte in separatem Thread
+            def start_exploration():
+                try:
+                    exploration_session.start()
+                except Exception as e:
+                    logger.error(f"Fehler bei Erkundung: {e}", exc_info=True)
+                    self.root.after(0, lambda: messagebox.showerror(
+                        "Fehler",
+                        f"Fehler bei Erkundung:\n\n{str(e)}\n\nDetails finden Sie in der Logdatei unter 'logs/ahg.log'."
+                    ))
+                    self.root.after(0, progress_dialog.dialog.destroy)
+            
+            threading.Thread(target=start_exploration, daemon=True).start()
+            
+            # Warte auf Dialog-Schließung
+            self.root.wait_window(progress_dialog.dialog)
+            
+            logger.info(f"Automatische Erkundung für Fenster {selected_window.get('hwnd')} gestartet")
+        
+        except Exception as e:
+            logger.error(f"Fehler beim Starten der Erkundung: {e}", exc_info=True)
+            messagebox.showerror(
+                "Fehler",
+                f"Fehler beim Starten der automatischen Erkundung:\n\n{str(e)}\n\nDetails finden Sie in der Logdatei unter 'logs/ahg.log'."
+            )
     
     def _open_settings(self):
         """Öffnet den Einstellungsdialog"""
@@ -673,6 +1280,34 @@ Für weitere Informationen siehe README.md
             color: Textfarbe
         """
         self.status_label.config(text=text, foreground=color)
+    
+    def _refresh_preview(self):
+        """Aktualisiert die Vorschau"""
+        if self.session_manager:
+            steps = self.session_manager.get_steps()
+            self.preview_panel.update_steps(steps)
+            self._update_session_status()
+    
+    def _handle_enter_key(self):
+        """Behandelt Enter-Taste je nach Kontext"""
+        # In Abhängigkeit vom aktuellen Fokus und Zustand
+        # Aktuell: Führt Standardaktion aus, z.B. Starten einer Session wenn bereit
+        if not self.session_active:
+            self._start_session()
+    
+    def _handle_space_key(self):
+        """Behandelt Space-Taste je nach Kontext"""
+        # Pausiert/Fortsetzt die Session je nach aktuellem Zustand
+        if self.session_active and self.session_manager:
+            if self.session_manager.paused:
+                self._pause_session()  # Fortsetzen
+            else:
+                self._pause_session()  # Pausieren
+    
+    def _toggle_preview(self):
+        """Schaltet die Vorschau-Ansicht um"""
+        # Aktiviert/Deaktiviert die Vorschau je nach aktuellem Zustand
+        self.preview_panel.toggle_preview_visibility()
     
     def set_prompt_profile(self, profile_name: str):
         """

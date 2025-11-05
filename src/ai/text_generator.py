@@ -78,12 +78,13 @@ class TextGenerator:
             logger.error(f"Fehler bei Textgenerierung: {e}", exc_info=True)
             return f"Schritt {step.get('step_number', '?')}: {step.get('window_title', 'Unbekannt')}"
     
-    def generate_all_step_descriptions(self, steps: List[Dict]) -> List[Dict]:
+    def generate_all_step_descriptions(self, steps: List[Dict], progress_callback=None) -> List[Dict]:
         """
         Generiert Beschreibungen für alle Schritte
         
         Args:
             steps: Liste von Schritten
+            progress_callback: Optionaler Callback für Fortschrittsanzeige (Wert 0-100, Status-Text)
             
         Returns:
             Liste von Schritten mit generierten Beschreibungen
@@ -91,6 +92,11 @@ class TextGenerator:
         updated_steps = []
         
         for i, step in enumerate(steps):
+            # Melde Fortschritt falls Callback vorhanden
+            if progress_callback and len(steps) > 0:
+                progress = (i / len(steps)) * 20  # Textgenerierung bekommt 20% der Gesamtfortschrittsbalken
+                progress_callback(progress, f"Generiere Beschreibungen... ({i+1}/{len(steps)})")
+            
             previous_steps = updated_steps  # Verwende bereits generierte Schritte als Kontext
             
             logger.debug(f"Generiere Beschreibung für Schritt {step.get('step_number', i+1)}...")

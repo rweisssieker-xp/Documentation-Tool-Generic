@@ -62,12 +62,12 @@ class SettingsDialog:
         model_combo = ttk.Combobox(
             api_frame,
             textvariable=self.model_var,
-            values=["gpt-4o", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"],
+            values=["gpt-5", "gpt-4o", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"],
             state="readonly",
             width=47
         )
         model_combo.grid(row=2, column=1, sticky=(tk.W, tk.E), pady=5, padx=5)
-        model_combo.set("gpt-4o")
+        model_combo.set("gpt-5")
         
         # Tab 2: Prompt-Profile
         profile_frame = ttk.Frame(notebook, padding="10")
@@ -250,6 +250,149 @@ class SettingsDialog:
         )
         double_click_spinbox.grid(row=3, column=1, sticky=tk.W, padx=5, pady=5)
         
+        # Tab 7: Cloud-Konfiguration
+        cloud_frame = ttk.Frame(notebook, padding="10")
+        notebook.add(cloud_frame, text="Cloud-Konfiguration")
+        
+        # OneDrive
+        ttk.Label(cloud_frame, text="OneDrive Access Token:").grid(row=0, column=0, sticky=tk.W, pady=5)
+        self.onedrive_token_var = tk.StringVar(value=os.getenv('ONEDRIVE_ACCESS_TOKEN', ''))
+        ttk.Entry(cloud_frame, textvariable=self.onedrive_token_var, width=50, show="*").grid(
+            row=0, column=1, sticky=(tk.W, tk.E), padx=5, pady=5
+        )
+        
+        # SharePoint
+        ttk.Label(cloud_frame, text="SharePoint Site URL:").grid(row=1, column=0, sticky=tk.W, pady=5)
+        self.sharepoint_url_var = tk.StringVar(value=os.getenv('SHAREPOINT_SITE_URL', ''))
+        ttk.Entry(cloud_frame, textvariable=self.sharepoint_url_var, width=50).grid(
+            row=1, column=1, sticky=(tk.W, tk.E), padx=5, pady=5
+        )
+        
+        ttk.Label(cloud_frame, text="SharePoint Access Token:").grid(row=2, column=0, sticky=tk.W, pady=5)
+        self.sharepoint_token_var = tk.StringVar(value=os.getenv('SHAREPOINT_ACCESS_TOKEN', ''))
+        ttk.Entry(cloud_frame, textvariable=self.sharepoint_token_var, width=50, show="*").grid(
+            row=2, column=1, sticky=(tk.W, tk.E), padx=5, pady=5
+        )
+        
+        # Google Drive
+        ttk.Label(cloud_frame, text="Google Drive Access Token:").grid(row=3, column=0, sticky=tk.W, pady=5)
+        self.gdrive_token_var = tk.StringVar(value=os.getenv('GOOGLE_DRIVE_ACCESS_TOKEN', ''))
+        ttk.Entry(cloud_frame, textvariable=self.gdrive_token_var, width=50, show="*").grid(
+            row=3, column=1, sticky=(tk.W, tk.E), padx=5, pady=5
+        )
+        
+        cloud_frame.columnconfigure(1, weight=1)
+        
+        # Tab 8: Platform-Konfiguration
+        platform_frame = ttk.Frame(notebook, padding="10")
+        notebook.add(platform_frame, text="Platform-Konfiguration")
+        
+        # Confluence
+        ttk.Label(platform_frame, text="Confluence Base URL:").grid(row=0, column=0, sticky=tk.W, pady=5)
+        self.confluence_url_var = tk.StringVar(value=os.getenv('CONFLUENCE_BASE_URL', ''))
+        ttk.Entry(platform_frame, textvariable=self.confluence_url_var, width=50).grid(
+            row=0, column=1, sticky=(tk.W, tk.E), padx=5, pady=5
+        )
+        
+        ttk.Label(platform_frame, text="Confluence Username:").grid(row=1, column=0, sticky=tk.W, pady=5)
+        self.confluence_username_var = tk.StringVar(value=os.getenv('CONFLUENCE_USERNAME', ''))
+        ttk.Entry(platform_frame, textvariable=self.confluence_username_var, width=50).grid(
+            row=1, column=1, sticky=(tk.W, tk.E), padx=5, pady=5
+        )
+        
+        ttk.Label(platform_frame, text="Confluence API Token:").grid(row=2, column=0, sticky=tk.W, pady=5)
+        self.confluence_token_var = tk.StringVar(value=os.getenv('CONFLUENCE_API_TOKEN', ''))
+        ttk.Entry(platform_frame, textvariable=self.confluence_token_var, width=50, show="*").grid(
+            row=2, column=1, sticky=(tk.W, tk.E), padx=5, pady=5
+        )
+        
+        # Notion
+        ttk.Label(platform_frame, text="Notion Token:").grid(row=3, column=0, sticky=tk.W, pady=5)
+        self.notion_token_var = tk.StringVar(value=os.getenv('NOTION_TOKEN', ''))
+        ttk.Entry(platform_frame, textvariable=self.notion_token_var, width=50, show="*").grid(
+            row=3, column=1, sticky=(tk.W, tk.E), padx=5, pady=5
+        )
+        
+        platform_frame.columnconfigure(1, weight=1)
+        
+        # Tab 9: Annotationen & UI-Element-Erkennung
+        annotation_frame = ttk.Frame(notebook, padding="10")
+        notebook.add(annotation_frame, text="Annotationen")
+        
+        self.auto_annotations_var = tk.BooleanVar(value=os.getenv('AUTO_ANNOTATIONS', 'false').lower() == 'true')
+        ttk.Checkbutton(
+            annotation_frame,
+            text="Automatische Screenshot-Annotationen aktivieren",
+            variable=self.auto_annotations_var
+        ).grid(row=0, column=0, columnspan=2, sticky=tk.W, pady=5)
+        
+        ttk.Label(annotation_frame, text="Annotation-Style:").grid(row=1, column=0, sticky=tk.W, pady=5)
+        self.annotation_style_var = tk.StringVar(value=os.getenv('ANNOTATION_STYLE', 'modern'))
+        style_combo = ttk.Combobox(
+            annotation_frame,
+            textvariable=self.annotation_style_var,
+            values=["modern", "classic", "minimal"],
+            state="readonly",
+            width=47
+        )
+        style_combo.grid(row=1, column=1, sticky=(tk.W, tk.E), padx=5, pady=5)
+        
+        self.ui_element_detection_var = tk.BooleanVar(value=os.getenv('UI_ELEMENT_DETECTION', 'false').lower() == 'true')
+        ttk.Checkbutton(
+            annotation_frame,
+            text="UI-Element-Erkennung aktivieren",
+            variable=self.ui_element_detection_var
+        ).grid(row=2, column=0, columnspan=2, sticky=tk.W, pady=5)
+        
+        annotation_frame.columnconfigure(1, weight=1)
+        
+        # Tab 8: Exploration-Konfiguration
+        exploration_frame = ttk.Frame(notebook, padding="10")
+        notebook.add(exploration_frame, text="Automatisierung")
+        
+        ttk.Label(exploration_frame, text="Maximale Tiefe:").grid(row=0, column=0, sticky=tk.W, pady=5)
+        self.max_depth_var = tk.IntVar(value=3)
+        ttk.Spinbox(exploration_frame, from_=1, to=10, textvariable=self.max_depth_var, width=10).grid(
+            row=0, column=1, sticky=tk.W, padx=5, pady=5
+        )
+        
+        ttk.Label(exploration_frame, text="Maximale Schritte:").grid(row=1, column=0, sticky=tk.W, pady=5)
+        self.max_steps_var = tk.IntVar(value=1000)
+        ttk.Spinbox(exploration_frame, from_=10, to=10000, textvariable=self.max_steps_var, width=10).grid(
+            row=1, column=1, sticky=tk.W, padx=5, pady=5
+        )
+        
+        ttk.Label(exploration_frame, text="Timeout (Sekunden):").grid(row=2, column=0, sticky=tk.W, pady=5)
+        self.timeout_var = tk.IntVar(value=3600)
+        ttk.Spinbox(exploration_frame, from_=60, to=72000, textvariable=self.timeout_var, width=10).grid(
+            row=2, column=1, sticky=tk.W, padx=5, pady=5
+        )
+        
+        ttk.Label(exploration_frame, text="Wartezeit zwischen Klicks (Sekunden):").grid(row=3, column=0, sticky=tk.W, pady=5)
+        self.wait_between_clicks_var = tk.DoubleVar(value=2.0)
+        ttk.Spinbox(exploration_frame, from_=0.1, to=10.0, increment=0.1, textvariable=self.wait_between_clicks_var, width=10).grid(
+            row=3, column=1, sticky=tk.W, padx=5, pady=5
+        )
+        
+        ttk.Label(exploration_frame, text="AI Confidence Threshold:").grid(row=4, column=0, sticky=tk.W, pady=5)
+        self.ai_confidence_var = tk.DoubleVar(value=0.7)
+        ttk.Spinbox(exploration_frame, from_=0.0, to=1.0, increment=0.1, textvariable=self.ai_confidence_var, width=10).grid(
+            row=4, column=1, sticky=tk.W, padx=5, pady=5
+        )
+        
+        ttk.Label(exploration_frame, text="Strategie:").grid(row=5, column=0, sticky=tk.W, pady=5)
+        self.strategy_var = tk.StringVar(value="hybrid")
+        strategy_combo = ttk.Combobox(
+            exploration_frame,
+            textvariable=self.strategy_var,
+            values=["breadth_first", "depth_first", "ai_guided", "hybrid"],
+            state="readonly",
+            width=20
+        )
+        strategy_combo.grid(row=5, column=1, sticky=tk.W, padx=5, pady=5)
+        
+        exploration_frame.columnconfigure(1, weight=1)
+        
         # Buttons am unteren Rand
         button_frame = ttk.Frame(self.dialog)
         button_frame.pack(fill=tk.X, padx=10, pady=10)
@@ -265,7 +408,7 @@ class SettingsDialog:
             self.api_key_var.set(api_key)
         
         # Lade Modell
-        model = os.getenv('OPENAI_MODEL', 'gpt-4o')
+        model = os.getenv('OPENAI_MODEL', 'gpt-5')
         self.model_var.set(model)
         
         # Lade verfügbare Profile
@@ -319,6 +462,23 @@ class SettingsDialog:
                 self.project_var.set(metadata_config.get('project', ''))
                 self.contact_var.set(metadata_config.get('contact', ''))
                 self.document_id_var.set(metadata_config.get('document_id', ''))
+            except Exception:
+                pass
+        
+        # Lade Exploration Config falls vorhanden
+        exploration_config_path = Path("config") / "exploration_config.yml"
+        if exploration_config_path.exists():
+            try:
+                import yaml
+                with open(exploration_config_path, 'r', encoding='utf-8') as f:
+                    exploration_config = yaml.safe_load(f)
+                
+                self.max_depth_var.set(exploration_config.get('max_depth', 3))
+                self.max_steps_var.set(exploration_config.get('max_steps', 1000))
+                self.timeout_var.set(exploration_config.get('timeout_seconds', 3600))
+                self.wait_between_clicks_var.set(exploration_config.get('wait_between_clicks', 2.0))
+                self.ai_confidence_var.set(exploration_config.get('ai_confidence_threshold', 0.7))
+                self.strategy_var.set(exploration_config.get('strategy', 'hybrid'))
             except Exception:
                 pass
         
@@ -400,6 +560,9 @@ class SettingsDialog:
             self._save_env_file('OPENAI_MODEL', model)
             os.environ['OPENAI_MODEL'] = model
             
+            # Lade .env neu
+            load_dotenv(override=True)
+            
             # Setze ausgewähltes Profil
             selection = self.profile_listbox.curselection()
             if selection:
@@ -429,7 +592,6 @@ class SettingsDialog:
             
             # Speichere Dokument-Metadaten
             metadata_config_path = Path("config") / "document_metadata.yml"
-            import yaml
             metadata_config = {
                 'department': self.department_var.get().strip(),
                 'project': self.project_var.get().strip(),
@@ -448,7 +610,51 @@ class SettingsDialog:
             self.trigger_config.double_click_delay = self.double_click_delay_var.get()
             self.trigger_config.save_config(trigger_config_path)
             
-            messagebox.showinfo("Erfolg", "Einstellungen gespeichert!")
+            # Speichere Cloud-Konfiguration
+            self._save_env_file('ONEDRIVE_ACCESS_TOKEN', self.onedrive_token_var.get().strip())
+            self._save_env_file('SHAREPOINT_SITE_URL', self.sharepoint_url_var.get().strip())
+            self._save_env_file('SHAREPOINT_ACCESS_TOKEN', self.sharepoint_token_var.get().strip())
+            self._save_env_file('GOOGLE_DRIVE_ACCESS_TOKEN', self.gdrive_token_var.get().strip())
+            
+            # Speichere Platform-Konfiguration
+            self._save_env_file('CONFLUENCE_BASE_URL', self.confluence_url_var.get().strip())
+            self._save_env_file('CONFLUENCE_USERNAME', self.confluence_username_var.get().strip())
+            self._save_env_file('CONFLUENCE_API_TOKEN', self.confluence_token_var.get().strip())
+            self._save_env_file('NOTION_TOKEN', self.notion_token_var.get().strip())
+            
+            # Speichere Annotation-Einstellungen
+            self._save_env_file('AUTO_ANNOTATIONS', 'true' if self.auto_annotations_var.get() else 'false')
+            self._save_env_file('ANNOTATION_STYLE', self.annotation_style_var.get())
+            self._save_env_file('UI_ELEMENT_DETECTION', 'true' if self.ui_element_detection_var.get() else 'false')
+            
+            # Speichere Exploration-Konfiguration
+            exploration_config_path = Path("config") / "exploration_config.yml"
+            exploration_config = {
+                'max_depth': self.max_depth_var.get(),
+                'max_steps': self.max_steps_var.get(),
+                'timeout_seconds': self.timeout_var.get(),
+                'wait_between_clicks': self.wait_between_clicks_var.get(),
+                'ai_confidence_threshold': self.ai_confidence_var.get(),
+                'strategy': self.strategy_var.get()
+            }
+            exploration_config_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(exploration_config_path, 'w', encoding='utf-8') as f:
+                yaml.dump(exploration_config, f, default_flow_style=False, allow_unicode=True)
+            
+            # Validiere API-Key wenn gesetzt
+            if api_key and api_key != 'your_openai_api_key_here':
+                try:
+                    from src.ai.openai_client import OpenAIClient
+                    test_client = OpenAIClient(api_key=api_key, model=model)
+                    if test_client.is_available():
+                        messagebox.showinfo("Erfolg", "Einstellungen gespeichert!\n\nAPI-Key wurde erfolgreich validiert.")
+                    else:
+                        messagebox.showwarning("Warnung", "Einstellungen gespeichert!\n\nAPI-Key konnte nicht validiert werden.")
+                except Exception as e:
+                    messagebox.showwarning("Warnung", f"Einstellungen gespeichert!\n\nAPI-Key-Validierung fehlgeschlagen: {str(e)}")
+            else:
+                messagebox.showinfo("Erfolg", "Einstellungen gespeichert!")
+            
             self.dialog.destroy()
         
         except Exception as e:
@@ -457,6 +663,7 @@ class SettingsDialog:
     def _save_env_file(self, key: str, value: str):
         """
         Speichert eine Environment-Variable in .env Datei
+        Behält Kommentare und andere Zeilen bei
         
         Args:
             key: Variable-Name
@@ -465,20 +672,46 @@ class SettingsDialog:
         env_path = Path('.env')
         
         # Lade bestehende .env oder erstelle neue
+        lines = []
         env_vars = {}
+        key_found = False
+        
         if env_path.exists():
             with open(env_path, 'r', encoding='utf-8') as f:
                 for line in f:
+                    original_line = line
                     line = line.strip()
-                    if line and not line.startswith('#') and '=' in line:
+                    
+                    # Kommentare und leere Zeilen beibehalten
+                    if not line or line.startswith('#'):
+                        lines.append(original_line.rstrip('\n'))
+                        continue
+                    
+                    # Parse Variable
+                    if '=' in line:
                         k, v = line.split('=', 1)
-                        env_vars[k.strip()] = v.strip()
+                        k = k.strip()
+                        v = v.strip().strip('"').strip("'")
+                        env_vars[k] = v
+                        
+                        # Ersetze Zeile wenn Variable bereits existiert
+                        if k == key:
+                            key_found = True
+                            lines.append(f"{key}={value}")
+                        else:
+                            lines.append(original_line.rstrip('\n'))
+                    else:
+                        lines.append(original_line.rstrip('\n'))
         
-        # Update Variable
-        env_vars[key] = value
+        # Füge Variable hinzu wenn nicht gefunden
+        if not key_found:
+            lines.append(f"{key}={value}")
         
         # Schreibe zurück
         with open(env_path, 'w', encoding='utf-8') as f:
-            for k, v in env_vars.items():
-                f.write(f"{k}={v}\n")
+            for line in lines:
+                f.write(line + '\n')
+        
+        # Aktualisiere Environment-Variable auch im aktuellen Prozess
+        os.environ[key] = value
 

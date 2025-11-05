@@ -27,12 +27,54 @@ class OpenAIClient:
             model: Modell-Name (falls nicht aus Environment)
         """
         self.api_key = api_key or os.getenv('OPENAI_API_KEY')
-        self.model = model or os.getenv('OPENAI_MODEL', 'gpt-4o')
+        self.model = model or os.getenv('OPENAI_MODEL', 'gpt-5')
         
         if not self.api_key or self.api_key == 'your_openai_api_key_here':
             raise ValueError("OpenAI API-Key nicht gesetzt! Bitte konfigurieren Sie OPENAI_API_KEY in .env")
         
-        self.client = OpenAI(api_key=self.api_key)
+        # Entferne mögliche proxies-Umgebungsvariablen die Probleme verursachen können
+        proxies_backup = {}
+        for key in ['HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy', 'ALL_PROXY']:
+            if key in os.environ:
+                proxies_backup[key] = os.environ.pop(key)
+        
+        # Versuche verschiedene Methoden zur Client-Erstellung
+        client_creation_errors = []
+        
+        # Versuch 1: Standard Client ohne zusätzliche Parameter
+        try:
+            self.client = OpenAI(api_key=self.api_key)
+        except TypeError as e:
+            if 'proxies' in str(e) or 'http_client' in str(e):
+                # Spezifischer Fehler für Proxy-bezogene Probleme
+                try:
+                    # Versuche, einen httpx-Client ohne Proxy-Einstellungen zu erstellen
+                    import httpx
+                    http_client = httpx.Client(
+                        timeout=60.0,
+                        # Explizit keine Proxy-Einstellungen
+                    )
+                    self.client = OpenAI(
+                        api_key=self.api_key,
+                        http_client=http_client
+                    )
+                    logger.info("OpenAI Client erfolgreich mit eigenem HTTP-Client erstellt")
+                except Exception as e2:
+                    client_creation_errors.append(f"Proxy-spezifischer Versuch fehlgeschlagen: {e2}")
+                    # Fallback zu Standard-Initialisierung
+                    self.client = OpenAI(api_key=self.api_key)
+                    logger.info("OpenAI Client mit Standard-Initialisierung erstellt")
+            else:
+                # Ein anderer TypeError - werfe ihn
+                raise e
+        except Exception as e:
+            client_creation_errors.append(f"Genereller Fehler: {e}")
+            # Versuche Standard-Client als Fallback
+            self.client = OpenAI(api_key=self.api_key)
+            logger.warning(f"OpenAI Client mit Fallback-Initialisierung erstellt nach Fehler: {e}")
+        finally:
+            # Stelle Umgebungsvariablen wieder her
+            os.environ.update(proxies_backup)
     
     def generate_text(
         self,
@@ -69,12 +111,22 @@ class OpenAIClient:
         
         for attempt in range(max_retries + 1):
             try:
-                response = self.client.chat.completions.create(
-                    model=self.model,
-                    messages=messages,
-                    temperature=temperature,
-                    max_tokens=max_tokens
-                )
+                # Versuche zuerst mit max_completion_tokens (neuere API)
+                try:
+                    response = self.client.chat.completions.create(
+                        model=self.model,
+                        messages=messages,
+                        temperature=temperature,
+                        max_completion_tokens=max_tokens  # Neuer Parametername
+                    )
+                except TypeError:
+                    # Fallback zu max_tokens (ältere API)
+                    response = self.client.chat.completions.create(
+                        model=self.model,
+                        messages=messages,
+                        temperature=temperature,
+                        max_tokens=max_tokens
+                    )
                 
                 return response.choices[0].message.content.strip()
             
@@ -171,19 +223,34 @@ class OpenAIClient:
             }
         ]
         
-        # Verwende gpt-4-vision-preview oder gpt-4o für Vision
-        vision_model = "gpt-4o" if "gpt-4o" in self.model else "gpt-4-vision-preview"
+        # Verwende gpt-5 oder gpt-4o für Vision (GPT-5 unterstützt Vision)
+        if "gpt-5" in self.model.lower():
+            vision_model = "gpt-5"
+        elif "gpt-4o" in self.model.lower():
+            vision_model = "gpt-4o"
+        else:
+            vision_model = "gpt-4-vision-preview"
         
         last_exception = None
         
         for attempt in range(max_retries + 1):
             try:
-                response = self.client.chat.completions.create(
-                    model=vision_model,
-                    messages=messages,
-                    temperature=temperature,
-                    max_tokens=max_tokens
-                )
+                # Versuche zuerst mit max_completion_tokens (neuere API)
+                try:
+                    response = self.client.chat.completions.create(
+                        model=vision_model,
+                        messages=messages,
+                        temperature=temperature,
+                        max_completion_tokens=max_tokens  # Neuer Parametername
+                    )
+                except TypeError:
+                    # Fallback zu max_tokens (ältere API)
+                    response = self.client.chat.completions.create(
+                        model=vision_model,
+                        messages=messages,
+                        temperature=temperature,
+                        max_tokens=max_tokens
+                    )
                 
                 return response.choices[0].message.content.strip()
             
