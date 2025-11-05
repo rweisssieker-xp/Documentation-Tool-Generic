@@ -1,0 +1,14 @@
+# Konfigurierbare Trigger-Schwellenwerte
+
+# Polling-Intervall in Sekunden (wie oft auf Änderungen geprüft wird)
+poll_interval: 0.5
+
+# Schwellenwert für Änderungs-Erkennung in Sekunden
+change_threshold: 0.3
+
+# Mindeständerung in Pixeln für Größenänderung
+size_change_threshold: 50
+
+# Zeitfenster für Doppelklick-Erkennung in Sekunden
+double_click_delay: 0.5
+

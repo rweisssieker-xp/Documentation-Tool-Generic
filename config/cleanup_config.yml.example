@@ -1,0 +1,12 @@
+# Konfiguration für automatische Bereinigung
+# Kopiere diese Datei nach cleanup_config.yml und passe die Werte an
+
+# Aktiviert die automatische Bereinigung beim Start der Anwendung
+auto_cleanup_enabled: true
+
+# Anzahl der Tage, die Screenshots aufbewahrt werden (Standard: 30)
+retention_days_screenshots: 30
+
+# Anzahl der Tage, die Sessions aufbewahrt werden (Standard: 90)
+retention_days_sessions: 90
+

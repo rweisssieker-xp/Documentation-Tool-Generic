@@ -1,0 +1,32 @@
+name: Standard
+description: Standard-Dokumentvorlage
+structure:
+  include_title_page: true
+  include_table_of_contents: true
+  include_introduction: true
+  include_steps: true
+  include_conclusion: true
+  include_security_notes: true
+  include_troubleshooting: false
+formatting:
+  title_font_size: 24
+  heading_font_size: 18
+  body_font_size: 11
+  margin_top: 1.0
+  margin_bottom: 1.0
+  margin_left: 1.0
+  margin_right: 1.0
+sections:
+  introduction:
+    title: Einleitung
+    level: 1
+  conclusion:
+    title: Fazit
+    level: 1
+  security_notes:
+    title: Sicherheitshinweise
+    level: 1
+  troubleshooting:
+    title: Fehlerbehebung
+    level: 1
+

@@ -1,0 +1,78 @@
+name: training
+language: de
+style: training
+description: Schulungshandbuch (erklärend, didaktisch)
+
+system_prompt: |
+  Du bist ein Experte für die Erstellung von Schulungsunterlagen für Software-Anwendungen.
+  Erstelle erklärende, didaktische Beschreibungen von Benutzeraktionen.
+  
+  Anforderungen:
+  - Verwende eine freundliche, erläuternde Sprache
+  - Erkläre nicht nur WAS, sondern auch WARUM
+  - Verwende kurze, verständliche Sätze
+  - Gib hilfreiche Tipps und Hinweise
+  - Verwende Beispiele wo sinnvoll
+  - Strukturiere Informationen klar
+
+step_template: |
+  Generiere eine erklärende Schulungsbeschreibung für folgenden Schritt:
+  
+  Schritt-Nummer: {step_number}
+  Fenster-Titel: {window_title}
+  OCR-Text aus Screenshot: {ocr_text}
+  
+  Vorherige Schritte (Kontext):
+  {context}
+  
+  Formuliere eine verständliche Anleitung (3-5 Sätze):
+  - Erkläre was der Benutzer tun soll
+  - Erkläre warum dieser Schritt notwendig ist
+  - Gib hilfreiche Tipps oder Hinweise
+  - Beschreibe das erwartete Ergebnis
+
+introduction_template: |
+  Erstelle eine einladende Einleitung für ein Schulungshandbuch.
+  
+  Anzahl der Schritte: {total_steps}
+  Erfasste Fenster: {window_titles}
+  
+  Die Einleitung soll:
+  - Den Lernzielen des Handbuchs beschreiben
+  - Die Zielgruppe ansprechen
+  - Eine Übersicht über den Prozess geben
+  - Motivation und Begeisterung wecken
+  - Freundlich und einladend sein (max. 200 Wörter)
+
+conclusion_template: |
+  Erstelle ein motivierendes Fazit für das Schulungshandbuch.
+  
+  Zusammenfassung der Schritte:
+  {summary}
+  
+  Das Fazit soll:
+  - Die wichtigsten Punkte zusammenfassen
+  - Den Benutzer ermutigen
+  - Nächste Schritte vorschlagen
+  - Hilfreiche Ressourcen erwähnen
+  - Positiv und motivierend sein (max. 150 Wörter)
+
+security_notes_template: |
+  Erstelle Sicherheitshinweise für dieses Schulungshandbuch.
+  
+  Prozess-Beschreibung: {summary}
+  
+  Die Sicherheitshinweise sollen:
+  - Freundlich und einladend formuliert sein
+  - Wichtige Sicherheitsaspekte erklären
+  - Präventive Maßnahmen in einfacher Sprache beschreiben
+  - Ermutigend sein (max. 150 Wörter)
+
+troubleshooting_template: |
+  Identifiziere häufige Probleme und Lösungen für diesen Lernprozess.
+  
+  Prozess-Beschreibung: {summary}
+  
+  Identifiziere 3-5 häufige Probleme mit erklärenden Lösungen.
+
+

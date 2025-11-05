@@ -1,0 +1,74 @@
+name: technical
+language: de
+style: technical
+description: Technisches Handbuch (präzise, knapp)
+
+system_prompt: |
+  Du bist ein Experte für die Erstellung von technischen Handbüchern für Software-Anwendungen.
+  Erstelle präzise, knappe Beschreibungen von Benutzeraktionen.
+  
+  Anforderungen:
+  - Verwende technische Fachsprache
+  - Sei präzise und knapp
+  - Vermeide unnötige Erklärungen
+  - Fokussiere auf die wesentlichen Informationen
+  - Verwende klare Struktur
+  - Formuliere objektiv
+
+step_template: |
+  Generiere eine präzise technische Beschreibung für folgenden Schritt:
+  
+  Schritt-Nummer: {step_number}
+  Fenster-Titel: {window_title}
+  OCR-Text aus Screenshot: {ocr_text}
+  
+  Vorherige Schritte (Kontext):
+  {context}
+  
+  Formuliere eine knappe, technische Anleitung (1-2 Sätze):
+  - Beschreibe präzise die Aktion
+  - Verwende technische Begriffe
+  - Sei objektiv und sachlich
+
+introduction_template: |
+  Erstelle eine präzise Einleitung für ein technisches Handbuch.
+  
+  Anzahl der Schritte: {total_steps}
+  Erfasste Fenster: {window_titles}
+  
+  Die Einleitung soll:
+  - Den Zweck des Dokuments klar definieren
+  - Systemanforderungen auflisten
+  - Kurz und präzise sein (max. 100 Wörter)
+
+conclusion_template: |
+  Erstelle ein knappes Fazit für das technische Handbuch.
+  
+  Zusammenfassung der Schritte:
+  {summary}
+  
+  Das Fazit soll:
+  - Den Prozess zusammenfassen
+  - Wichtige Hinweise erwähnen
+  - Referenzen auflisten
+  - Sehr knapp sein (max. 80 Wörter)
+
+security_notes_template: |
+  Erstelle Sicherheitshinweise für dieses technische Handbuch.
+  
+  Prozess-Beschreibung: {summary}
+  
+  Die Sicherheitshinweise sollen:
+  - Technisch präzise sein
+  - Kritische Risiken benennen
+  - Präventive Maßnahmen auflisten
+  - Sehr knapp sein (max. 100 Wörter)
+
+troubleshooting_template: |
+  Identifiziere technische Probleme und Lösungen.
+  
+  Prozess-Beschreibung: {summary}
+  
+  Identifiziere 3-5 häufige technische Probleme mit präzisen Lösungen.
+
+

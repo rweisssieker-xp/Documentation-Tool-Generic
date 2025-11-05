@@ -1,0 +1,73 @@
+name: sop
+language: de
+style: sop
+description: Standardarbeitsanweisung (formal, normgerecht)
+
+system_prompt: |
+  Du bist ein Experte für die Erstellung von Standardarbeitsanweisungen (SOP) für Software-Anwendungen.
+  Erstelle präzise, formale und normgerechte Beschreibungen von Benutzeraktionen.
+  
+  Anforderungen:
+  - Verwende kurze, präzise Sätze im Imperativ
+  - Verwende technische Fachsprache
+  - Nummeriere Schritte klar
+  - Beschreibe erwartete Ergebnisse
+  - Verwende passive Formulierungen wo angemessen
+  - Sei objektiv und sachlich
+
+step_template: |
+  Generiere eine präzise SOP-Beschreibung für folgenden Schritt:
+  
+  Schritt-Nummer: {step_number}
+  Fenster-Titel: {window_title}
+  OCR-Text aus Screenshot: {ocr_text}
+  
+  Vorherige Schritte (Kontext):
+  {context}
+  
+  Formuliere eine kurze, präzise Anweisung im Imperativ (max. 2-3 Sätze).
+  Beschreibe was der Benutzer tut und welches Ergebnis erwartet wird.
+
+introduction_template: |
+  Erstelle eine formale Einleitung für eine Standardarbeitsanweisung.
+  
+  Anzahl der Schritte: {total_steps}
+  Erfasste Fenster: {window_titles}
+  
+  Die Einleitung soll:
+  - Den Zweck des Prozesses beschreiben
+  - Den Anwendungsbereich definieren
+  - Verantwortlichkeiten benennen
+  - Kurz und präzise sein (max. 150 Wörter)
+
+conclusion_template: |
+  Erstelle ein Fazit für die Standardarbeitsanweisung.
+  
+  Zusammenfassung der Schritte:
+  {summary}
+  
+  Das Fazit soll:
+  - Den erfolgreichen Abschluss des Prozesses bestätigen
+  - Wichtige Hinweise wiederholen
+  - Referenzen zu verwandten Dokumenten erwähnen
+  - Kurz sein (max. 100 Wörter)
+
+security_notes_template: |
+  Erstelle Sicherheitshinweise für diese Standardarbeitsanweisung.
+  
+  Prozess-Beschreibung: {summary}
+  
+  Die Sicherheitshinweise sollen:
+  - Allgemeine Sicherheitsaspekte abdecken
+  - Spezifische Risiken des Prozesses benennen
+  - Präventive Maßnahmen vorschlagen
+  - Kurz und präzise sein (max. 150 Wörter)
+
+troubleshooting_template: |
+  Identifiziere potenzielle Probleme und Lösungen für diesen Prozess.
+  
+  Prozess-Beschreibung: {summary}
+  
+  Identifiziere 3-5 häufige Probleme mit konkreten Lösungen.
+
+

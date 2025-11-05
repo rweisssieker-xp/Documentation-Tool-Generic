@@ -1,0 +1,38 @@
+# Beispiel-Privacy-Mask-Konfiguration
+
+enabled: true
+
+regions:
+  # Beispiel: Rechteckige Maske für Bereich oben links (0-1 = relative Koordinaten)
+  - type: rectangle
+    x: 0.0
+    y: 0.0
+    width: 0.2
+    height: 0.1
+    description: "Schwärzt Bereich oben links (z.B. für Benutzername)"
+  
+  # Beispiel: Pixel-basierte Maske
+  - type: rectangle
+    x: 100
+    y: 200
+    width: 300
+    height: 50
+    description: "Schwärzt spezifischen Bereich bei Pixel-Koordinaten"
+  
+  # Beispiel: Kreisförmige Maske (z.B. für Avatar)
+  - type: circle
+    center_x: 0.5
+    center_y: 0.15
+    radius: 0.05
+    description: "Schwärzt Avatar-Bereich"
+  
+  # Beispiel: Polygon-Maske für komplexe Bereiche
+  # - type: polygon
+  #   points:
+  #     - [0.1, 0.1]
+  #     - [0.3, 0.1]
+  #     - [0.3, 0.3]
+  #     - [0.1, 0.3]
+  #   description: "Schwärzt polygonförmigen Bereich"
+
+
