@@ -122,6 +122,9 @@ Die Anwendung verwendet YAML-basierte Prompt-Profile für verschiedene Dokumenta
 - **Undo/Redo**: Rückgängig machen und Wiederholen von Schritten
 - **Session-Statistiken**: Live-Anzeige von Dauer, Schritten, Screenshots
 - **Session-Wiederherstellung**: Automatische Wiederherstellung nach Absturz
+  - Dialog zur Auswahl wiederherstellbarer Sessions (Menü: Session → Session wiederherstellen)
+  - Automatisches Speichern des Session-Zustands
+  - Validierung vor Wiederherstellung
 
 ### Export-Formate
 
@@ -129,7 +132,19 @@ Die Anwendung verwendet YAML-basierte Prompt-Profile für verschiedene Dokumenta
 - **PDF**: Portable Document Format
 - **Markdown**: Für Wikis und Web-Portale
 - **HTML**: Für Web-Ansicht mit Styling
-- **JSON/CSV**: Für Audit-Trail und Datenanalyse
+### Tools & Utilities
+
+- **Manuelle Bereinigung**: Tools → Bereinigung ausführen (Menü)
+  - Löscht alte Screenshots und Sessions nach konfigurierbaren Retention-Richtlinien
+  - Zeigt Statistiken über gelöschte Dateien
+- **Session-Wiederherstellung**: Session → Session wiederherstellen (Menü)
+  - Dialog zur Auswahl wiederherstellbarer Sessions
+  - Validierung vor Wiederherstellung
+  - Möglichkeit, Sessions zu löschen
+- **Startup-Validierung**: Automatische Prüfung beim Start
+  - Python-Version, Dependencies, Config-Dateien
+  - Environment-Variablen, externe Tools
+  - Manuelle Validierung: `python scripts/validate_startup.py`
 
 ### Datenschutz & Compliance
 
@@ -463,12 +478,18 @@ Bei Fragen oder Problemen erstelle bitte ein Issue im Repository.
 
 ## Changelog
 
+Siehe [CHANGELOG.md](CHANGELOG.md) für vollständige Versionshistorie.
+
 ### Version 1.0.0
 
-- Vollständige Implementierung aller geplanten Features
-- Umfassende Test-Suite
-- Erweiterte Dokumentation
-- Production-ready Error Handling
-- Session Recovery & Cleanup
+- ✅ Vollständige Implementierung aller geplanten Features
+- ✅ Umfassende Test-Suite (Unit & Integration)
+- ✅ Erweiterte Dokumentation (README, Quickstart, API-Docs)
+- ✅ Production-ready Error Handling & Logging
+- ✅ Session Recovery & Cleanup-Management
+- ✅ CI/CD Pipeline (GitHub Actions)
+- ✅ Startup-Validierung
+- ✅ GUI mit Menüleiste und Dialogen
+- ✅ Alle erweiterten Features implementiert
 
 

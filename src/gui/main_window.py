@@ -585,29 +585,25 @@ Für weitere Informationen siehe README.md
         self.root.wait_window(dialog.dialog)
         
         # Wenn Session wiederhergestellt wurde, aktualisiere UI
-        if dialog.selected_session_id:
-            # Versuche Session-Manager zu setzen
-            try:
-                from src.monitor.session_manager import SessionManager
-                session_manager = SessionManager.restore_from_state(dialog.selected_session_id)
-                if session_manager:
-                    self.session_manager = session_manager
-                    self.session_active = True
-                    self.current_profile = session_manager.prompt_profile
-                    
-                    # Aktualisiere UI
-                    self.start_button.config(state=tk.DISABLED)
-                    self.stop_button.config(state=tk.NORMAL)
-                    self.pause_button.config(state=tk.NORMAL if not session_manager.paused else tk.DISABLED)
-                    self._update_status("Session wiederhergestellt", "green")
-                    
-                    # Lade Schritte
-                    steps = session_manager.get_steps()
-                    self.preview_panel.update_steps(steps)
-                    self._update_undo_redo_buttons()
-                    self._update_session_status()
-            except Exception as e:
-                logger.error(f"Fehler beim Setzen der wiederhergestellten Session: {e}", exc_info=True)
+        if hasattr(dialog, 'restored_session') and dialog.restored_session:
+            session_manager = dialog.restored_session
+            self.session_manager = session_manager
+            self.session_active = True
+            self.current_profile = session_manager.prompt_profile
+            
+            # Aktualisiere UI
+            self.start_button.config(state=tk.DISABLED)
+            self.stop_button.config(state=tk.NORMAL)
+            self.pause_button.config(state=tk.NORMAL if not session_manager.paused else tk.DISABLED)
+            self._update_status("Session wiederhergestellt", "green")
+            
+            # Lade Schritte
+            steps = session_manager.get_steps()
+            self.preview_panel.update_steps(steps)
+            self._update_undo_redo_buttons()
+            self._update_session_status()
+            
+            logger.info(f"Session UI aktualisiert: {session_manager.session_id}")
     
     def _run_manual_cleanup(self):
         """Führt manuelle Bereinigung aus"""

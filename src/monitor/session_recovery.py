@@ -87,10 +87,12 @@ class SessionRecovery:
                     'session_id': session_id,
                     'state_file': str(state_file),
                     'steps_count': len(steps),
+                    'step_count': len(steps),  # Alias für Kompatibilität
                     'start_time': state_data.get('start_time'),
                     'saved_at': state_data.get('saved_at'),
                     'is_complete': is_complete,
-                    'prompt_profile': state_data.get('prompt_profile')
+                    'prompt_profile': state_data.get('prompt_profile'),
+                    'active': state_data.get('metadata', {}).get('active', False)
                 })
             
             except Exception as e:

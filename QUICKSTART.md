@@ -98,6 +98,18 @@ python main.py
 - `F1` - Einstellungen
 - `ESC` - Session beenden (wenn aktiv)
 
+### Menü-Funktionen
+
+**Session-Menü:**
+- Session wiederherstellen: Stellt abgebrochene Sessions wieder her
+
+**Tools-Menü:**
+- Bereinigung ausführen: Manuelle Bereinigung alter Dateien
+
+**Hilfe-Menü:**
+- Tastenkürzel: Zeigt alle verfügbaren Shortcuts
+- Über: Informationen zur Anwendung
+
 ### Best Practices
 
 1. **Vorbereitung ist wichtig:**
