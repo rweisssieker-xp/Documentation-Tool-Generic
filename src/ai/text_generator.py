@@ -45,17 +45,17 @@ class TextGenerator:
             Generierte Beschreibung
         """
         try:
-            # Extrahiere OCR-Text aus Screenshot
-            screenshot_path = Path(step.get('screenshot_path', ''))
-            ocr_text = ""
-            
-            if screenshot_path.exists() and self.ocr_engine.is_available():
-                ocr_text = self.ocr_engine.extract_text(screenshot_path)
+            # Verwende OCR-Text aus Step falls bereits vorhanden, sonst extrahiere
+            ocr_text = step.get('ocr_text', '')
+            if not ocr_text:
+                screenshot_path = Path(step.get('screenshot_path', ''))
+                if screenshot_path.exists() and self.ocr_engine.is_available():
+                    ocr_text = self.ocr_engine.extract_text(screenshot_path, timeout=2.0)
             
             # Hole System-Prompt
             system_prompt = self.prompt_system.get_system_prompt()
             
-            # Formatiere User-Prompt
+            # Formatiere User-Prompt mit OCR-Text und Kontext
             user_prompt = self.prompt_system.format_step_prompt(
                 step_number=step.get('step_number', 0),
                 window_title=step.get('window_title', 'Unbekannt'),
@@ -64,18 +64,21 @@ class TextGenerator:
                 metadata=step.get('metadata', {})
             )
             
-            # Generiere Text
+            # Generiere Text mit Retry-Logik und Rate Limit Handling
             description = self.openai_client.generate_text(
                 system_prompt=system_prompt,
                 user_prompt=user_prompt,
                 temperature=0.7,
-                max_tokens=500
+                max_tokens=500,
+                max_retries=3,
+                retry_delay=1.0
             )
             
             return description
         
         except Exception as e:
             logger.error(f"Fehler bei Textgenerierung: {e}", exc_info=True)
+            # Fallback: Verwende einfache Beschreibung
             return f"Schritt {step.get('step_number', '?')}: {step.get('window_title', 'Unbekannt')}"
     
     def generate_all_step_descriptions(self, steps: List[Dict], progress_callback=None) -> List[Dict]:

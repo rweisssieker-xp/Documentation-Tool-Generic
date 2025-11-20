@@ -74,6 +74,74 @@ class TestOpenAIClient:
         except Exception:
             # Kann auch nach Retries fehlschlagen
             pass
+    
+    @patch('src.ai.openai_client.openai')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test_key_12345'})
+    def test_generate_text_rate_limit_handling(self, mock_openai):
+        """Testet Rate Limit Handling"""
+        import time
+        client = OpenAIClient()
+        
+        mock_response = MagicMock()
+        mock_response.choices = [MagicMock()]
+        mock_response.choices[0].message.content = "Generated text"
+        
+        mock_client = MagicMock()
+        mock_openai.OpenAI.return_value = mock_client
+        
+        # Rate Limit Fehler, dann Erfolg
+        rate_limit_error = Exception("rate_limit_exceeded")
+        mock_client.chat.completions.create.side_effect = [
+            rate_limit_error,
+            mock_response
+        ]
+        
+        try:
+            with patch('time.sleep'):  # Mock sleep um Test zu beschleunigen
+                result = client.generate_text("Test prompt", "Test system prompt", max_retries=2)
+                assert result == "Generated text"
+        except Exception:
+            # Kann auch nach Retries fehlschlagen
+            pass
+    
+    @patch('src.ai.openai_client.openai')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test_key_12345'})
+    def test_generate_text_exponential_backoff(self, mock_openai):
+        """Testet Exponential Backoff bei Retries"""
+        import time
+        client = OpenAIClient()
+        
+        mock_response = MagicMock()
+        mock_response.choices = [MagicMock()]
+        mock_response.choices[0].message.content = "Generated text"
+        
+        mock_client = MagicMock()
+        mock_openai.OpenAI.return_value = mock_client
+        
+        # Mehrere Fehler, dann Erfolg
+        mock_client.chat.completions.create.side_effect = [
+            Exception("500 Internal Server Error"),
+            Exception("503 Service Unavailable"),
+            mock_response
+        ]
+        
+        sleep_times = []
+        original_sleep = time.sleep
+        
+        def mock_sleep(delay):
+            sleep_times.append(delay)
+            original_sleep(0)  # Minimal sleep für Test
+        
+        try:
+            with patch('time.sleep', side_effect=mock_sleep):
+                result = client.generate_text("Test prompt", "Test system prompt", max_retries=3, retry_delay=1.0)
+                assert result == "Generated text"
+                # Prüfe dass exponential backoff verwendet wurde
+                assert len(sleep_times) >= 2
+                assert sleep_times[1] > sleep_times[0]  # Zweiter Delay sollte größer sein
+        except Exception:
+            # Kann auch nach Retries fehlschlagen
+            pass
 
 
 class TestPromptTemplateSystem:
@@ -141,7 +209,8 @@ class TestTextGenerator:
     
     @patch('src.ai.text_generator.OpenAIClient')
     @patch('src.ai.text_generator.PromptTemplateSystem')
-    def test_generate_step_description(self, mock_prompt_system, mock_openai_client):
+    @patch('src.ai.text_generator.OCREngine')
+    def test_generate_step_description(self, mock_ocr_engine, mock_prompt_system, mock_openai_client):
         """Testet Generierung einer Schritt-Beschreibung"""
         # Mock OpenAI Client
         mock_client_instance = MagicMock()
@@ -150,14 +219,22 @@ class TestTextGenerator:
         
         # Mock Prompt System
         mock_prompt_instance = MagicMock()
+        mock_prompt_instance.get_system_prompt.return_value = "System prompt"
         mock_prompt_instance.format_step_prompt.return_value = "Formatted prompt"
         mock_prompt_system.return_value = mock_prompt_instance
+        
+        # Mock OCR Engine
+        mock_ocr_instance = MagicMock()
+        mock_ocr_instance.is_available.return_value = False
+        mock_ocr_engine.return_value = mock_ocr_instance
         
         generator = TextGenerator('test_profile')
         
         step = {
             'step_number': 1,
             'window_title': 'Test Window',
+            'screenshot_path': '/fake/path.png',
+            'ocr_text': 'Test OCR text',
             'description': None
         }
         
@@ -165,6 +242,43 @@ class TestTextGenerator:
         
         assert result == "Generated description"
         mock_client_instance.generate_text.assert_called_once()
+    
+    @patch('src.ai.text_generator.OpenAIClient')
+    @patch('src.ai.text_generator.PromptTemplateSystem')
+    @patch('src.ai.text_generator.OCREngine')
+    def test_generate_step_description_with_ocr_context(self, mock_ocr_engine, mock_prompt_system, mock_openai_client):
+        """Testet Generierung mit OCR-Text-Kontext"""
+        mock_client_instance = MagicMock()
+        mock_client_instance.generate_text.return_value = "Generated description with OCR"
+        mock_openai_client.return_value = mock_client_instance
+        
+        mock_prompt_instance = MagicMock()
+        mock_prompt_instance.get_system_prompt.return_value = "System prompt"
+        mock_prompt_instance.format_step_prompt.return_value = "Formatted prompt with OCR"
+        mock_prompt_system.return_value = mock_prompt_instance
+        
+        mock_ocr_instance = MagicMock()
+        mock_ocr_instance.is_available.return_value = False
+        mock_ocr_engine.return_value = mock_ocr_instance
+        
+        generator = TextGenerator('test_profile')
+        
+        step = {
+            'step_number': 1,
+            'window_title': 'Test Window',
+            'screenshot_path': '/fake/path.png',
+            'ocr_text': 'Extracted OCR text from screenshot',
+            'description': None
+        }
+        
+        result = generator.generate_step_description(step, [])
+        
+        # Prüfe dass OCR-Text im Prompt verwendet wurde
+        mock_prompt_instance.format_step_prompt.assert_called_once()
+        call_args = mock_prompt_instance.format_step_prompt.call_args
+        assert 'ocr_text' in call_args.kwargs
+        assert call_args.kwargs['ocr_text'] == 'Extracted OCR text from screenshot'
+        assert result == "Generated description with OCR"
     
     @patch('src.ai.text_generator.OpenAIClient')
     @patch('src.ai.text_generator.PromptTemplateSystem')

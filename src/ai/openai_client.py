@@ -135,22 +135,36 @@ class OpenAIClient:
                 error_msg = str(e)
                 
                 # Prüfe ob es ein temporärer Fehler ist (Rate Limit, Server Error)
-                is_retryable = (
+                is_rate_limit = (
                     "rate_limit" in error_msg.lower() or
+                    "429" in error_msg or
+                    "quota" in error_msg.lower()
+                )
+                
+                is_retryable = (
+                    is_rate_limit or
                     "500" in error_msg or
                     "502" in error_msg or
                     "503" in error_msg or
-                    "429" in error_msg or
                     "timeout" in error_msg.lower()
                 )
                 
                 if attempt < max_retries and is_retryable:
-                    # Exponential backoff
-                    delay = retry_delay * (2 ** attempt)
-                    logger.warning(
-                        f"OpenAI API-Fehler (Versuch {attempt + 1}/{max_retries + 1}): {error_msg}. "
-                        f"Wiederhole in {delay:.1f} Sekunden..."
-                    )
+                    # Exponential backoff mit spezieller Behandlung für Rate Limits
+                    if is_rate_limit:
+                        # Rate Limit: Längere Wartezeit
+                        delay = retry_delay * (2 ** attempt) * 2  # Doppelte Wartezeit für Rate Limits
+                        logger.warning(
+                            f"OpenAI API Rate Limit erreicht (Versuch {attempt + 1}/{max_retries + 1}). "
+                            f"Warte {delay:.1f} Sekunden vor Wiederholung..."
+                        )
+                    else:
+                        # Andere retryable Fehler: Standard exponential backoff
+                        delay = retry_delay * (2 ** attempt)
+                        logger.warning(
+                            f"OpenAI API-Fehler (Versuch {attempt + 1}/{max_retries + 1}): {error_msg}. "
+                            f"Wiederhole in {delay:.1f} Sekunden..."
+                        )
                     time.sleep(delay)
                 else:
                     # Nicht wiederholbar oder keine Versuche mehr

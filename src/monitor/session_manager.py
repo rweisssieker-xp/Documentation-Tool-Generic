@@ -14,6 +14,7 @@ from src.monitor.mouse_keyboard_monitor import MouseKeyboardMonitor
 from src.capture.screenshot import ScreenshotCapture
 from src.capture.privacy_mask import PrivacyMask
 from src.capture.ocr_engine import OCREngine
+from src.ai.text_generator import TextGenerator
 from src.audit.audit_logger import AuditLogger
 from src.config.trigger_config import TriggerConfig
 from src.utils.logger import get_logger
@@ -70,6 +71,9 @@ class SessionManager:
         
         # OCR-Engine für automatische Erkennung
         self.ocr_engine = OCREngine()
+        
+        # AI Text Generator für Schritt-Beschreibungen
+        self.text_generator = TextGenerator(prompt_profile=prompt_profile)
         
         self.screenshot_capture = ScreenshotCapture(self.screenshot_dir, privacy_mask=privacy_mask)
         self.audit_logger = AuditLogger(session_id, self.output_dir)
@@ -284,6 +288,43 @@ class SessionManager:
             if self.screenshot_capture.privacy_mask and ocr_text:
                 self.screenshot_capture.privacy_mask.apply_mask(screenshot_path, ocr_text=ocr_text)
             
+            # Generiere AI-Text-Beschreibung für Schritt
+            ai_description = ""
+            
+            # Performance-Messung: Start-Zeit für 5s-Target
+            ai_start_time = time.time()
+            
+            try:
+                # Verwende bereits generierte Schritte als Kontext
+                previous_steps = self.steps[-3:] if len(self.steps) > 0 else []
+                
+                # Erstelle temporäres Step-Dict für AI-Generierung
+                temp_step = {
+                    'step_number': step_number,
+                    'screenshot_path': str(screenshot_path),
+                    'window_title': screenshot_metadata.get('window_title', window_info.get('title', 'Unbekannt')),
+                    'ocr_text': ocr_text,
+                    'metadata': window_info
+                }
+                
+                # Generiere AI-Beschreibung
+                ai_description = self.text_generator.generate_step_description(
+                    step=temp_step,
+                    previous_steps=previous_steps
+                )
+                
+                # Performance-Messung: Prüfe ob 5s-Target eingehalten wurde
+                ai_duration = time.time() - ai_start_time
+                if ai_duration > 5.0:
+                    logger.warning(f"AI-Text-Generierung dauerte {ai_duration:.2f}s (Target: 5.0s) für Schritt {step_number}")
+                else:
+                    logger.debug(f"AI-Text-Generierung abgeschlossen in {ai_duration:.2f}s für Schritt {step_number}")
+                    
+            except Exception as e:
+                logger.warning(f"AI-Text-Generierung fehlgeschlagen für Schritt {step_number}: {e}", exc_info=True)
+                # Fallback: Verwende einfache Beschreibung
+                ai_description = f"Schritt {step_number}: {screenshot_metadata.get('window_title', window_info.get('title', 'Unbekannt'))}"
+            
             # Erstelle Schritt-Datenstruktur mit Screenshot-Metadaten
             step = {
                 'step_number': step_number,
@@ -296,10 +337,10 @@ class SessionManager:
                 'screenshot_path': str(screenshot_path),
                 'screenshot_id': screenshot_metadata.get('screenshot_id'),  # UUID-Format
                 'screenshot_metadata': screenshot_metadata,
-                'ocr_text': ocr_text,  # OCR-Text wird asynchron aktualisiert
+                'ocr_text': ocr_text,
                 'ocr_confidence': ocr_confidence,
-                'metadata': window_info,
-                'description': None  # Wird später durch AI generiert
+                'description': ai_description,  # AI-generierte Beschreibung
+                'metadata': window_info
             }
             
             # Protokolliere im Audit-Log

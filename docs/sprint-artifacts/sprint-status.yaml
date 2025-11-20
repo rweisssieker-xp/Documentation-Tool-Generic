@@ -43,12 +43,12 @@ development_status:
   epic-1: contexted
   1-1-automatic-screenshot-capture: done
   1-2-ocr-text-extraction-from-screenshots: done
-  1-3-ai-powered-text-generation: backlog
-  1-4-multi-format-document-export: backlog
+  1-3-ai-powered-text-generation: done
+  1-4-multi-format-document-export: done
   epic-1-retrospective: optional
 
   # Epic 2: Session Management & Control
-  epic-2: backlog
+  epic-2: contexted
   2-1-session-start-and-stop: backlog
   2-2-session-pause-and-resume: backlog
   2-3-undo-and-redo-functionality: backlog
