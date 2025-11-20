@@ -184,11 +184,15 @@ class ExplorationManager:
         """Erstellt Screenshot"""
         try:
             step_number = self.navigation_state.step_count + 1
-            screenshot_path = self.screenshot_capture.capture_window(
+            capture_result = self.screenshot_capture.capture_window(
                 hwnd=self.controller.hwnd,
-                step_number=step_number
+                step_number=step_number,
+                session_id=self.session_manager.session_id
             )
-            return screenshot_path
+            if capture_result:
+                screenshot_path, _ = capture_result
+                return screenshot_path
+            return None
         except Exception as e:
             logger.error(f"Fehler beim Erstellen des Screenshots: {e}", exc_info=True)
             return None

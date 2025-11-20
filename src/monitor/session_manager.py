@@ -223,11 +223,28 @@ class SessionManager:
         try:
             step_number = len(self.steps) + 1
             
-            # Erstelle Screenshot
-            screenshot_path = self.screenshot_capture.capture_window(
+            # Performance-Messung: Start-Zeit für 100ms-Target
+            capture_start_time = time.time()
+            
+            # Erstelle Screenshot mit Metadaten
+            capture_result = self.screenshot_capture.capture_window(
                 window_info.get('hwnd'),
-                step_number
+                step_number,
+                session_id=self.session_id
             )
+            
+            # Performance-Messung: Prüfe ob 100ms-Target eingehalten wurde
+            capture_duration = (time.time() - capture_start_time) * 1000  # in ms
+            if capture_duration > 100:
+                logger.warning(f"Screenshot-Capture dauerte {capture_duration:.2f}ms (Target: 100ms) für Schritt {step_number}")
+            else:
+                logger.debug(f"Screenshot-Capture abgeschlossen in {capture_duration:.2f}ms für Schritt {step_number}")
+            
+            if not capture_result:
+                logger.warning(f"Screenshot konnte nicht erstellt werden für Schritt {step_number}")
+                return
+            
+            screenshot_path, screenshot_metadata = capture_result
             
             if not screenshot_path or not screenshot_path.exists():
                 logger.warning(f"Screenshot konnte nicht erstellt werden für Schritt {step_number}")
@@ -235,23 +252,52 @@ class SessionManager:
             
             # Extrahiere OCR-Text für automatische Privacy-Erkennung
             ocr_text = ""
+            ocr_confidence = 0.0
+            
+            # Performance-Messung: Start-Zeit für 2s-Target
+            ocr_start_time = time.time()
+            
             if self.ocr_engine.is_available():
-                ocr_text = self.ocr_engine.extract_text(screenshot_path)
+                try:
+                    # OCR-Verarbeitung mit Timeout
+                    ocr_text = self.ocr_engine.extract_text(screenshot_path, timeout=2.0)
+                    
+                    # Hole Konfidenz-Informationen wenn Text extrahiert wurde
+                    if ocr_text:
+                        ocr_result = self.ocr_engine.extract_text_with_confidence(screenshot_path, timeout=2.0)
+                        ocr_confidence = ocr_result.get('confidence', 0.0)
+                    
+                    # Performance-Messung: Prüfe ob 2s-Target eingehalten wurde
+                    ocr_duration = time.time() - ocr_start_time
+                    if ocr_duration > 2.0:
+                        logger.warning(f"OCR-Verarbeitung dauerte {ocr_duration:.2f}s (Target: 2.0s) für Schritt {step_number}")
+                    else:
+                        logger.debug(f"OCR-Verarbeitung abgeschlossen in {ocr_duration:.2f}s für Schritt {step_number}")
+                    
+                except Exception as e:
+                    logger.warning(f"OCR-Fehler für Schritt {step_number}: {e}", exc_info=True)
+                    ocr_text = ""
+            else:
+                logger.warning("Tesseract OCR nicht verfügbar. OCR-Text wird nicht extrahiert.")
             
             # Wende Privacy-Mask mit automatischer Erkennung an
             if self.screenshot_capture.privacy_mask and ocr_text:
                 self.screenshot_capture.privacy_mask.apply_mask(screenshot_path, ocr_text=ocr_text)
             
-            # Erstelle Schritt-Datenstruktur
+            # Erstelle Schritt-Datenstruktur mit Screenshot-Metadaten
             step = {
                 'step_number': step_number,
-                'timestamp': datetime.now().isoformat(),
-                'window_title': window_info.get('title', 'Unbekannt'),
+                'timestamp': screenshot_metadata.get('timestamp', datetime.now().isoformat()),
+                'window_title': screenshot_metadata.get('window_title', window_info.get('title', 'Unbekannt')),
                 'window_class': window_info.get('class_name', 'Unbekannt'),
                 'process_name': window_info.get('process_name', 'Unbekannt'),
                 'executable_path': window_info.get('executable_path'),
                 'position': window_info.get('position', {}),
                 'screenshot_path': str(screenshot_path),
+                'screenshot_id': screenshot_metadata.get('screenshot_id'),  # UUID-Format
+                'screenshot_metadata': screenshot_metadata,
+                'ocr_text': ocr_text,  # OCR-Text wird asynchron aktualisiert
+                'ocr_confidence': ocr_confidence,
                 'metadata': window_info,
                 'description': None  # Wird später durch AI generiert
             }
