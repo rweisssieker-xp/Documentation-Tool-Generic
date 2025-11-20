@@ -73,30 +73,30 @@ development_status:
   epic-4-retrospective: optional
 
   # Epic 5: Batch & Comparison Features
-  epic-5: backlog
-  5-1-batch-session-processing: backlog
-  5-2-session-comparison: backlog
+  epic-5: contexted
+  5-1-batch-session-processing: done
+  5-2-session-comparison: done
   epic-5-retrospective: optional
 
   # Epic 6: Automation & Intelligence
-  epic-6: backlog
-  6-1-automated-application-exploration: backlog
-  6-2-intelligent-step-consolidation: backlog
+  epic-6: contexted
+  6-1-automated-application-exploration: done
+  6-2-intelligent-step-consolidation: done
   epic-6-retrospective: optional
 
   # Epic 7: Analytics & Insights
-  epic-7: backlog
-  7-1-statistics-dashboard: backlog
-  7-2-test-checklist-generation: backlog
+  epic-7: contexted
+  7-1-statistics-dashboard: done
+  7-2-test-checklist-generation: done
   epic-7-retrospective: optional
 
   # Epic 8: Configuration & Customization
-  epic-8: backlog
-  8-1-configuration-management: backlog
+  epic-8: contexted
+  8-1-configuration-management: done
   epic-8-retrospective: optional
 
   # Epic 9: User Experience Enhancements
-  epic-9: backlog
-  9-1-live-preview-panel: backlog
+  epic-9: contexted
+  9-1-live-preview-panel: done
   epic-9-retrospective: optional
 

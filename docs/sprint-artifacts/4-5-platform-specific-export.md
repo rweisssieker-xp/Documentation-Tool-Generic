@@ -12,39 +12,48 @@ so that **I can create platform-specific documentation (Confluence, Notion, etc.
 
 1. **Given** a documentation session is complete, **when** I select a target platform (Confluence, Notion, GitHub, etc.), **then** platform-specific formatting is applied
 2. **Given** platform-specific formatting is applied, **then** the documentation is optimized for the platform's requirements
-3. **Given** platform optimization is applied, **then** content quality is maintained
-4. **Given** platform export is complete, **then** the documentation is exported in the platform's format
-5. **Given** platform features are available, **then** platform-specific features are utilized (macros, embeds, etc.)
+3. **Given** platform-specific formatting is applied, **then** content quality is maintained
+4. **Given** platform export is configured, **then** the documentation is exported in the platform's format
+5. **Given** platform supports special features, **then** platform-specific features are utilized (macros, embeds, etc.)
 
 ## Tasks / Subtasks
 
-- [x] **Task 1: Platform Exporters** (AC: 1, 4)
-  - [x] Implement Confluence exporter (already implemented)
-  - [x] Implement Notion exporter (already implemented)
-  - [x] Implement SharePoint exporter (already implemented)
-  - [x] Support platform-specific formats (already implemented)
+- [x] **Task 1: Confluence Export** (AC: 1, 2, 4, 5)
+  - [x] Implement Confluence Wiki markup generation (already implemented)
+  - [x] Support Confluence API integration (already implemented)
+  - [x] Handle authentication (Basic Auth) (already implemented)
+  - [x] Create/update Confluence pages (already implemented)
+  - [x] Support parent page hierarchy (already implemented)
 
-- [x] **Task 2: Platform Optimization** (AC: 2, 3)
-  - [x] Apply platform-specific formatting (already implemented)
-  - [x] Optimize for platform requirements (already implemented)
-  - [x] Maintain content quality (already implemented)
+- [x] **Task 2: Notion Export** (AC: 1, 2, 4, 5)
+  - [x] Implement Notion blocks generation (already implemented)
+  - [x] Support Notion API v1 integration (already implemented)
+  - [x] Handle Notion authentication (Bearer token) (already implemented)
+  - [x] Create pages in Notion databases (already implemented)
+  - [x] Support Notion block structure (already implemented)
 
-- [x] **Task 3: Platform Features** (AC: 5)
-  - [x] Utilize Confluence wiki markup (already implemented)
-  - [x] Utilize Notion API features (already implemented)
-  - [x] Utilize SharePoint REST API (already implemented)
+- [x] **Task 3: SharePoint Export** (AC: 1, 2, 4)
+  - [x] Implement SharePoint export via Microsoft Graph API (already implemented)
+  - [x] Support OAuth access token authentication (already implemented)
+  - [x] Upload documents to SharePoint folders (already implemented)
+  - [x] Integrate with cloud_exporter for upload (already implemented)
 
-- [x] **Task 4: Integration** (AC: All)
-  - [x] API authentication handling (already implemented)
-  - [x] Error handling for platform APIs (already implemented)
-  - [x] Return platform-specific results (already implemented)
+- [x] **Task 4: Content Quality** (AC: 3)
+  - [x] Maintain content quality across platforms (already implemented)
+  - [x] Preserve step structure and information (already implemented)
+  - [x] Handle screenshot references appropriately (already implemented)
+
+- [x] **Task 5: Platform-Specific Features** (AC: 5)
+  - [x] Utilize Confluence macros and formatting (already implemented)
+  - [x] Utilize Notion block types (headings, paragraphs) (already implemented)
+  - [x] Support platform-specific metadata (already implemented)
 
 ## Dev Notes
 
 ### Architecture Patterns and Constraints
 
 - **Layered Architecture:** Platform export belongs to Document Layer (`src/document/`)
-- **Separation of Concerns:** PlatformExporters handles platform-specific logic
+- **Separation of Concerns:** PlatformExporters handles platform-specific logic, cloud_exporter handles uploads
 - **Error Handling:** Use exception-based error handling with comprehensive logging (ADR-008)
 - **Logging:** Use structured logging via `src/utils/logger.py` (ADR-009)
 
@@ -52,12 +61,15 @@ so that **I can create platform-specific documentation (Confluence, Notion, etc.
 
 **Files Verified:**
 - `src/document/platform_exporters.py` - PlatformExporters class ✅
-- Confluence, Notion, SharePoint exporters ✅
+- Confluence export ✅
+- Notion export ✅
+- SharePoint export ✅
 - Platform-specific formatting ✅
 
 **Dependencies:**
 - `requests` for HTTP API calls
-- Platform-specific APIs (Confluence REST, Notion API, SharePoint REST)
+- OAuth/Bearer tokens for authentication
+- Microsoft Graph API for SharePoint
 
 ### Testing Standards
 
@@ -67,9 +79,11 @@ so that **I can create platform-specific documentation (Confluence, Notion, etc.
 
 ### Project Structure Notes
 
-- Platforms: Confluence, Notion, SharePoint
-- Authentication via API tokens/usernames
-- Platform-specific markup generation
+- Platform exporters support: Confluence, Notion, SharePoint
+- Authentication via environment variables or parameters
+- Confluence uses Wiki markup format
+- Notion uses block-based API structure
+- SharePoint uses Microsoft Graph API
 
 ### References
 
@@ -86,40 +100,50 @@ Composer (Cursor AI)
 
 ### Debug Log References
 
-- Platform-specific export already fully implemented
-- Multiple platforms supported
-- Platform optimization verified
+- Platform export already fully implemented
+- Multiple platform support verified
+- Content quality maintained
 
 ### Completion Notes List
 
 ✅ **Implementation Complete:**
 
-1. **Platform Exporters**: 
-   - `export_to_confluence()` method for Confluence export
-   - `export_to_notion()` method for Notion export
-   - `export_to_sharepoint()` method for SharePoint export
-   - Platform-specific markup generation
+1. **Confluence Export**: 
+   - `export_to_confluence()` method exports to Confluence
+   - Confluence Wiki markup generation
+   - Basic Auth authentication
+   - Page creation/update via REST API
+   - Support for parent page hierarchy
 
-2. **Platform Optimization**: 
-   - Confluence wiki markup generation
-   - Notion API integration
-   - SharePoint REST API integration
-   - Content quality maintained
+2. **Notion Export**: 
+   - `export_to_notion()` method exports to Notion
+   - Notion blocks generation (headings, paragraphs)
+   - Bearer token authentication
+   - Page creation in databases
+   - Notion API v1 integration
 
-3. **Platform Features**: 
-   - Confluence: Wiki markup, space keys, parent pages
-   - Notion: Database integration, page creation
-   - SharePoint: Site URLs, folder paths
+3. **SharePoint Export**: 
+   - `export_to_sharepoint()` method exports to SharePoint
+   - Microsoft Graph API integration
+   - OAuth access token authentication
+   - Document upload to SharePoint folders
+   - Integration with cloud_exporter
 
-4. **Integration**: 
-   - API authentication via tokens/usernames
-   - Error handling for platform APIs
-   - Return platform-specific results (page IDs, URLs)
+4. **Content Quality**: 
+   - Step structure preserved across platforms
+   - Screenshot references handled appropriately
+   - Content formatting maintained
+
+5. **Platform-Specific Features**: 
+   - Confluence Wiki markup with macros
+   - Notion block structure with rich text
+   - Platform-specific metadata support
 
 ### File List
 
 **Verified Files (All Already Implemented):**
 - `src/document/platform_exporters.py` - PlatformExporters class ✅
-- Confluence, Notion, SharePoint exporters ✅
+- Confluence export ✅
+- Notion export ✅
+- SharePoint export ✅
 - Platform-specific formatting ✅
-
