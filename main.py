@@ -133,7 +133,7 @@ def main():
         root.mainloop()
     except Exception as e:
         logger.critical(f"Kritischer Fehler beim Starten der GUI: {e}", exc_info=True)
-        print(f"\n❌ Kritischer Fehler: {e}")
+        print(f"\n[FEHLER] Kritischer Fehler: {e}")
         print("Bitte überprüfen Sie die Log-Datei in logs/ahg.log für Details.")
         sys.exit(1)
 

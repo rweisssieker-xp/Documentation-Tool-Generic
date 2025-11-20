@@ -31,18 +31,20 @@ class SessionQueue:
         self.processing_thread = None
         self.progress_callback: Optional[Callable] = None
     
-    def add_session(self, session_id: str, session_manager: SessionManager):
+    def add_session(self, session_id: str, session_manager: SessionManager, export_formats: Optional[Dict[str, bool]] = None):
         """
         Fügt eine Session zur Queue hinzu
         
         Args:
             session_id: Eindeutige Session-ID
             session_manager: SessionManager-Instanz
+            export_formats: Optional Export-Format-Optionen
         """
         with self.lock:
             self.queue.put({
                 'session_id': session_id,
                 'session_manager': session_manager,
+                'export_formats': export_formats,
                 'added_at': datetime.now()
             })
             self.active_sessions[session_id] = session_manager
@@ -83,6 +85,7 @@ class SessionQueue:
                 item = self.queue.get(timeout=1.0)
                 session_id = item['session_id']
                 session_manager = item['session_manager']
+                export_formats = item.get('export_formats')
                 
                 # Update Progress
                 if self.progress_callback:
@@ -97,7 +100,7 @@ class SessionQueue:
                     from src.document.template_engine import TemplateEngine
                     
                     template_engine = TemplateEngine(session_manager)
-                    output_path = template_engine.generate_document()
+                    output_path = template_engine.generate_document(export_formats=export_formats)
                     
                     # Markiere als erfolgreich
                     with self.lock:
@@ -186,15 +189,16 @@ class BatchProcessor:
         self.session_queue = SessionQueue()
         self.max_concurrent = 1  # Standard: sequenziell, kann erhöht werden
     
-    def add_session(self, session_id: str, session_manager: SessionManager):
+    def add_session(self, session_id: str, session_manager: SessionManager, export_formats: Optional[Dict[str, bool]] = None):
         """
         Fügt eine Session zur Verarbeitung hinzu
         
         Args:
             session_id: Eindeutige Session-ID
             session_manager: SessionManager-Instanz
+            export_formats: Optional Export-Format-Optionen
         """
-        self.session_queue.add_session(session_id, session_manager)
+        self.session_queue.add_session(session_id, session_manager, export_formats)
     
     def process_all(self, progress_callback: Optional[Callable] = None):
         """

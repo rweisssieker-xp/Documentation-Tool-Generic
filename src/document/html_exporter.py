@@ -64,6 +64,14 @@ class HTMLExporter:
         html_parts.append('<body>\n')
         html_parts.append('<div class="container">\n')
         
+        # Dark Mode Toggle
+        html_parts.append('<div class="controls">\n')
+        html_parts.append('<button id="darkModeToggle" onclick="toggleDarkMode()">🌙 Dark Mode</button>\n')
+        html_parts.append('<div class="search-box">\n')
+        html_parts.append('<input type="text" id="searchInput" placeholder="Suche..." onkeyup="searchSteps()">\n')
+        html_parts.append('</div>\n')
+        html_parts.append('</div>\n')
+        
         # Titel
         html_parts.append(f'<h1>{title}</h1>\n')
         
@@ -107,18 +115,29 @@ class HTMLExporter:
             if include_screenshots:
                 screenshot_path = step.get('screenshot_path', '')
                 if screenshot_path and Path(screenshot_path).exists():
+                    step_id = f"step-{step_number}"
                     if embed_images:
                         img_data = self._embed_image(screenshot_path)
-                        html_parts.append(f'<img src="data:image/png;base64,{img_data}" alt="Abbildung {step_number}" class="screenshot">\n')
+                        html_parts.append(f'<div class="screenshot-container">\n')
+                        html_parts.append(f'<img src="data:image/png;base64,{img_data}" alt="Abbildung {step_number}" class="screenshot" id="img-{step_id}" data-step="{step_number}">\n')
+                        html_parts.append(f'<p class="caption"><em>Abbildung {step_number}: {window_title}</em></p>\n')
+                        html_parts.append('</div>\n')
                     else:
                         rel_path = Path(screenshot_path).relative_to(output_path.parent)
-                        html_parts.append(f'<img src="{rel_path}" alt="Abbildung {step_number}" class="screenshot">\n')
-                    html_parts.append(f'<p class="caption"><em>Abbildung {step_number}: {window_title}</em></p>\n')
+                        html_parts.append(f'<div class="screenshot-container">\n')
+                        html_parts.append(f'<img src="{rel_path}" alt="Abbildung {step_number}" class="screenshot" id="img-{step_id}" data-step="{step_number}">\n')
+                        html_parts.append(f'<p class="caption"><em>Abbildung {step_number}: {window_title}</em></p>\n')
+                        html_parts.append('</div>\n')
             
-            # Beschreibung
+            # Beschreibung mit expandable Section
             if description:
                 formatted_desc = description.replace(chr(10), "<br>")
-                html_parts.append(f'<div class="description">{formatted_desc}</div>\n')
+                html_parts.append(f'<div class="description-container">\n')
+                html_parts.append(f'<div class="description-toggle" onclick="toggleDetails(\'{step_id}\')">')
+                html_parts.append('<span class="toggle-icon" id="icon-' + step_id + '">▼</span> Details anzeigen/verbergen')
+                html_parts.append('</div>\n')
+                html_parts.append(f'<div class="description" id="desc-{step_id}" style="display: block;">{formatted_desc}</div>\n')
+                html_parts.append('</div>\n')
             
             # Metadaten
             timestamp = step.get('timestamp', '')
@@ -137,6 +156,7 @@ class HTMLExporter:
         
         # Body-End
         html_parts.append('</div>\n')
+        html_parts.append(self._get_javascript())
         html_parts.append('</body>\n')
         html_parts.append('</html>\n')
         
@@ -329,4 +349,93 @@ class HTMLExporter:
         """
         with open(image_path, 'rb') as f:
             return base64.b64encode(f.read()).decode('utf-8')
+    
+    def _get_javascript(self) -> str:
+        """Gibt JavaScript für interaktive Features zurück"""
+        return """
+<script>
+    // Dark Mode Toggle
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDark);
+        document.getElementById('darkModeToggle').textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+    }
+    
+    // Load Dark Mode preference
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+        document.getElementById('darkModeToggle').textContent = '☀️ Light Mode';
+    }
+    
+    // Toggle Details
+    function toggleDetails(stepId) {
+        const desc = document.getElementById('desc-' + stepId);
+        const icon = document.getElementById('icon-' + stepId);
+        
+        if (desc.style.display === 'none') {
+            desc.style.display = 'block';
+            icon.textContent = '▼';
+        } else {
+            desc.style.display = 'none';
+            icon.textContent = '▶';
+        }
+    }
+    
+    // Search Functionality
+    function searchSteps() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toLowerCase();
+        const steps = document.querySelectorAll('.step');
+        
+        steps.forEach(step => {
+            const text = step.textContent.toLowerCase();
+            const title = step.querySelector('h2').textContent.toLowerCase();
+            
+            if (text.includes(filter) || title.includes(filter)) {
+                step.style.display = 'block';
+            } else {
+                step.style.display = 'none';
+            }
+        });
+    }
+    
+    // Tooltip für Screenshots
+    document.addEventListener('DOMContentLoaded', function() {
+        const screenshots = document.querySelectorAll('.screenshot');
+        screenshots.forEach(img => {
+            img.addEventListener('mouseenter', function(e) {
+                const tooltip = document.createElement('div');
+                tooltip.className = 'tooltip';
+                tooltip.textContent = 'Klicken zum Vergrößern';
+                tooltip.style.left = e.pageX + 'px';
+                tooltip.style.top = (e.pageY - 30) + 'px';
+                document.body.appendChild(tooltip);
+                tooltip.style.display = 'block';
+                
+                img.addEventListener('mouseleave', function() {
+                    tooltip.remove();
+                }, { once: true });
+            });
+            
+            // Click to enlarge
+            img.addEventListener('click', function() {
+                const modal = document.createElement('div');
+                modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; cursor: pointer;';
+                
+                const modalImg = document.createElement('img');
+                modalImg.src = img.src;
+                modalImg.style.cssText = 'max-width: 90%; max-height: 90%;';
+                
+                modal.appendChild(modalImg);
+                document.body.appendChild(modal);
+                
+                modal.addEventListener('click', function() {
+                    modal.remove();
+                });
+            });
+        });
+    });
+</script>
+"""
 

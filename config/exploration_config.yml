@@ -1,0 +1,23 @@
+# Exploration Configuration
+
+# Maximale Tiefe in Menü-Hierarchie
+max_depth: 3
+
+# Maximale Anzahl Schritte
+max_steps: 1000
+
+# Timeout für gesamte Erkundung (in Sekunden)
+timeout_seconds: 3600
+
+# Wartezeit zwischen Klicks (in Sekunden)
+wait_between_clicks: 2.0
+
+# Minimum Confidence für AI-Entscheidungen (0.0-1.0)
+ai_confidence_threshold: 0.7
+
+# Schwellenwert für Screenshot-Vergleich (0.0-1.0)
+screenshot_similarity_threshold: 0.95
+
+# Erkundungsstrategie: "breadth_first", "depth_first", "ai_guided", "hybrid"
+strategy: "hybrid"
+

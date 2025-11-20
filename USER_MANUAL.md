@@ -94,7 +94,7 @@ pip install -r requirements.txt
 2. Edit `.env` and add your OpenAI API key:
    ```
    OPENAI_API_KEY=your_openai_api_key_here
-   OPENAI_MODEL=gpt-4o
+   OPENAI_MODEL=gpt-5
    ```
 
 3. Configure other optional settings as needed:
@@ -126,7 +126,7 @@ If you see the main window without errors, the installation is successful.
    - Press **F1** or click **Settings** to open the settings dialog
    - Navigate to the **OpenAI API** tab
    - Enter your OpenAI API key (or verify it's loaded from `.env`)
-   - Select your preferred model (default: `gpt-4o`)
+   - Select your preferred model (default: `gpt-5`)
 
 3. **Select a Prompt Profile**
    - Go to the **Prompt Profiles** tab in settings
@@ -211,6 +211,28 @@ The main window consists of several key areas:
   - Pause/Resume (Ctrl+P)
   - Undo (Ctrl+Z)
   - Redo (Ctrl+Y)
+  - Session Recovery... (restore interrupted sessions)
+
+- **Export Menu**
+  - Multi-Language Export... (export documentation in multiple languages)
+  - Cloud Upload... (upload documents to cloud storage)
+  - Quick Reference... (generate quick reference guide)
+  - Video Export... (create video walkthrough from screenshots)
+  - Platform Export... (export for specific platforms)
+  - Export Filter... (filter steps before export)
+
+- **Tools Menu**
+  - Cleanup... (manual cleanup of old files)
+  - Batch Processing... (process multiple sessions)
+  - Statistics... (view session statistics dashboard)
+  - Step Consolidation... (merge similar steps)
+  - Session Comparison... (compare two sessions)
+  - Test Checklist Generator... (generate test checklist from steps)
+  - Quality Check... (check documentation quality)
+  - Export Filter... (filter steps before export)
+
+- **Automation Menu**
+  - App Exploration... (automatically explore and document an application)
 
 - **Help Menu**
   - Keyboard Shortcuts
@@ -240,6 +262,7 @@ Displays captured steps in real-time:
 - Screenshot thumbnails
 - Step descriptions (after AI generation)
 - Ability to delete individual steps
+- Ability to reorder steps (drag and drop)
 
 #### 5. Statistics Panel
 
@@ -262,7 +285,7 @@ Accessible via **F1** or the Settings button, organized in tabs:
 
 #### OpenAI API Tab
 - API Key configuration
-- Model selection (gpt-4o, gpt-4-turbo, gpt-4, gpt-3.5-turbo)
+- Model selection (gpt-5, gpt-4o, gpt-4-turbo, gpt-4, gpt-3.5-turbo)
 
 #### Prompt Profiles Tab
 - List of available profiles
@@ -764,7 +787,8 @@ The application uses OpenAI's GPT models to generate high-quality, context-aware
 - Supports multiple OpenAI models
 
 **Model Selection**:
-- **gpt-4o** (recommended): Best quality, supports vision API
+- **gpt-5** (recommended): Latest flagship model, best quality, supports vision API
+- **gpt-4o**: High quality, supports vision API
 - **gpt-4-turbo**: High quality, faster than gpt-4
 - **gpt-4**: High quality, reliable
 - **gpt-3.5-turbo**: Fast, cost-effective for simple tasks
@@ -792,7 +816,7 @@ The application uses OpenAI's GPT models to generate high-quality, context-aware
 **Example API Request**:
 ```python
 {
-    "model": "gpt-4o",
+    "model": "gpt-5",
     "messages": [
         {
             "role": "system",
@@ -989,7 +1013,7 @@ Previous Steps:
 **Token Usage**:
 - Each step: ~200-500 tokens
 - Entire session: ~5000-15000 tokens (20 steps)
-- Costs: ~$0.01-0.10 per session (gpt-4o pricing)
+- Costs: ~$0.01-0.10 per session (gpt-5 pricing, varies by model)
 
 **Optimization Tips**:
 - Use gpt-3.5-turbo for faster, cheaper generation
@@ -1687,6 +1711,20 @@ The system tracks comprehensive statistics:
 - Cannot undo after document generation
 - History lost on application restart
 
+### Step Reordering
+
+Change the order of captured steps:
+
+1. In the preview panel, select a step
+2. Drag and drop to new position
+3. Steps are automatically renumbered
+4. Changes are saved immediately
+
+**Use Cases**:
+- Correct step sequence
+- Reorganize workflow steps
+- Group related steps together
+
 **Best Practices**:
 - Review steps before ending session
 - Use Undo immediately after mistakes
@@ -1719,7 +1757,7 @@ Configure in `.env` file:
 OPENAI_API_KEY=your_api_key_here
 
 # Optional
-OPENAI_MODEL=gpt-4o
+OPENAI_MODEL=gpt-5
 OCR_LANGUAGE=deu+eng
 PRIVACY_MASK_ENABLED=true
 DATA_DIR=./data
@@ -1960,7 +1998,7 @@ include_security_notes: false
 
 **Solutions**:
 - Try a different prompt profile
-- Use a more capable model (e.g., gpt-4o instead of gpt-3.5-turbo)
+- Use a more capable model (e.g., gpt-5 or gpt-4o instead of gpt-3.5-turbo)
 - Improve screenshot quality (ensure text is readable)
 - Check OCR is working correctly
 - Review and customize prompt templates
@@ -2022,10 +2060,213 @@ type logs\ahg.log | more
 
 Process multiple sessions simultaneously:
 
-1. Configure batch settings
-2. Queue multiple sessions
-3. Track progress per session
-4. Generate all documents at once
+1. Open **Tools → Batch Processing...**
+2. Select multiple sessions from the list
+3. Choose export formats for batch processing
+4. Start batch processing
+5. Track progress per session in real-time
+6. All documents are generated automatically
+
+**Use Cases**:
+- Process multiple related documentation sessions
+- Generate documentation for entire workflows
+- Bulk export of existing sessions
+
+### Step Consolidation
+
+Merge similar or redundant steps:
+
+1. Open **Tools → Step Consolidation...**
+2. Select steps to consolidate
+3. Configure consolidation settings (similarity threshold)
+4. Review consolidated steps
+5. Apply changes to session
+
+**Features**:
+- AI-powered step similarity detection
+- Automatic merging of duplicate steps
+- Manual review and approval
+- Preserves step order and context
+
+### Session Comparison
+
+Compare two sessions to identify differences:
+
+1. Open **Tools → Session Comparison...**
+2. Select two sessions to compare
+3. View side-by-side comparison
+4. Identify added, removed, or modified steps
+5. Export comparison report
+
+**Use Cases**:
+- Track changes between documentation versions
+- Identify workflow variations
+- Compare test scenarios
+
+### Test Checklist Generator
+
+Generate test checklists from documented steps:
+
+1. Open **Tools → Test Checklist Generator...**
+2. Select session with steps
+3. Configure checklist options
+4. Generate checklist with checkboxes
+5. Export as DOCX, PDF, or Markdown
+
+**Features**:
+- Automatic test case generation
+- Customizable checklist format
+- Multiple export formats
+- Step-by-step validation items
+
+### Quality Check
+
+Assess documentation quality and completeness:
+
+1. Open **Tools → Quality Check...**
+2. Review quality metrics:
+   - Screenshot quality
+   - Step completeness
+   - Description clarity
+   - Consistency checks
+3. View detailed quality report
+4. Address quality issues
+
+**Quality Metrics**:
+- Screenshot resolution and clarity
+- Step description completeness
+- Consistency of terminology
+- Coverage of workflow steps
+- Metadata completeness
+
+### Multi-Language Export
+
+Export documentation in multiple languages:
+
+1. Open **Export → Multi-Language Export...**
+2. Select source session
+3. Choose target languages
+4. Configure translation settings
+5. Generate translated documents
+
+**Supported Features**:
+- Automatic translation using AI
+- Language-specific formatting
+- Cultural adaptation
+- Terminology consistency
+
+### Cloud Upload
+
+Upload generated documents to cloud storage:
+
+1. Open **Export → Cloud Upload...**
+2. Select files to upload (DOCX, PDF, Markdown, HTML)
+3. Choose cloud provider (configured in settings)
+4. Configure upload options
+5. Upload files
+
+**Supported Platforms**:
+- Google Drive
+- Microsoft OneDrive
+- Dropbox
+- Custom cloud storage (configurable)
+
+### Quick Reference Export
+
+Generate concise quick reference guides:
+
+1. Open **Export → Quick Reference...**
+2. Select session with steps
+3. Configure reference format:
+   - Compact layout
+   - Key steps only
+   - Visual highlights
+4. Generate quick reference document
+
+**Use Cases**:
+- One-page workflow summaries
+- Quick-start guides
+- Reference cards
+- Cheat sheets
+
+### Video Export
+
+Create video walkthroughs from screenshots:
+
+1. Open **Export → Video Export...**
+2. Select session with steps
+3. Configure video settings:
+   - Frame duration per step
+   - Transitions
+   - Resolution
+   - Audio narration (optional)
+4. Generate video file
+
+**Features**:
+- Automatic video creation from screenshots
+- Customizable timing
+- Smooth transitions
+- Multiple video formats (MP4, AVI)
+
+### Platform Export
+
+Export documentation for specific platforms:
+
+1. Open **Export → Platform Export...**
+2. Select target platform:
+   - Confluence
+   - Jira
+   - SharePoint
+   - WordPress
+   - Custom platform
+3. Configure platform-specific settings
+4. Generate formatted export
+
+**Platform-Specific Features**:
+- Platform-compatible formatting
+- Metadata mapping
+- Image optimization
+- Link generation
+
+### Automated App Exploration
+
+Automatically explore and document an application:
+
+1. Open **Automation → App Exploration...**
+2. Select target application
+3. Configure exploration settings:
+   - Exploration depth
+   - UI element discovery
+   - Navigation strategy
+4. Start automated exploration
+5. Review generated documentation
+
+**Features**:
+- Automatic UI element discovery
+- Intelligent navigation
+- Step-by-step documentation
+- Screenshot capture at each step
+
+### Statistics Dashboard
+
+View comprehensive session statistics:
+
+1. Open **Tools → Statistics...**
+2. Review metrics:
+   - Session duration
+   - Step count
+   - Screenshot statistics
+   - Quality metrics
+   - Window usage patterns
+   - Process statistics
+3. View graphs and charts
+4. Export statistics report
+
+**Statistics Include**:
+- Basic metrics (duration, steps, screenshots)
+- Advanced metrics (windows used, processes used)
+- Quality metrics (screenshot quality, description completeness)
+- Performance metrics (capture times, processing times)
 
 ### Custom Prompt Profiles
 

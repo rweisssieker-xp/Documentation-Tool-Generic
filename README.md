@@ -10,7 +10,9 @@ Vollautomatische Erstellung bebilderter technischer Handbücher aus realen Nutzu
 - **AI-Textgenerierung**: Verwendet OpenAI GPT-5 für präzise, kontextbezogene Beschreibungen
 - **Revisionssichere Dokumentation**: SHA-256-Hash für jeden Screenshot, vollständiger Audit-Trail
 - **Konfigurierbare Prompt-Profile**: Verschiedene Stile (SOP, Schulung, technisch)
-- **Mehrere Ausgabeformate**: DOCX, PDF, JSON/CSV für Audit-Trail
+- **Mehrere Ausgabeformate**: DOCX, PDF, Markdown, HTML, JSON/CSV für Audit-Trail
+- **Erweiterte Export-Optionen**: Multi-Sprach-Export, Cloud-Upload, Quick-Reference, Video-Export, Platform-Export
+- **Automatisierungs-Features**: Automatische App-Erkundung und Dokumentation
 
 ## Schnellstart
 
@@ -132,11 +134,31 @@ Die Anwendung verwendet YAML-basierte Prompt-Profile für verschiedene Dokumenta
 - **PDF**: Portable Document Format
 - **Markdown**: Für Wikis und Web-Portale
 - **HTML**: Für Web-Ansicht mit Styling
+- **JSON**: Audit-Trail im JSON-Format
+- **CSV**: Audit-Trail im CSV-Format
 ### Tools & Utilities
 
 - **Manuelle Bereinigung**: Tools → Bereinigung ausführen (Menü)
   - Löscht alte Screenshots und Sessions nach konfigurierbaren Retention-Richtlinien
   - Zeigt Statistiken über gelöschte Dateien
+- **Batch-Verarbeitung**: Tools → Batch-Verarbeitung (Menü)
+  - Verarbeitet mehrere Sessions gleichzeitig
+  - Generiert Dokumente für mehrere Sessions in einem Durchgang
+- **Statistiken-Dashboard**: Tools → Statistiken (Menü)
+  - Zeigt umfassende Session-Statistiken
+  - Qualitäts-Metriken und Performance-Daten
+- **Schritt-Konsolidierung**: Tools → Schritt-Konsolidierung (Menü)
+  - Führt ähnliche oder redundante Schritte zusammen
+  - AI-gestützte Ähnlichkeitserkennung
+- **Session-Vergleich**: Tools → Session-Vergleich (Menü)
+  - Vergleicht zwei Sessions nebeneinander
+  - Identifiziert Unterschiede und Änderungen
+- **Test-Checkliste**: Tools → Test-Checkliste generieren (Menü)
+  - Generiert Test-Checklisten aus dokumentierten Schritten
+  - Exportierbar als DOCX, PDF oder Markdown
+- **Qualitätsprüfung**: Tools → Qualitätsprüfung (Menü)
+  - Prüft Dokumentationsqualität und Vollständigkeit
+  - Zeigt detaillierte Qualitätsberichte
 - **Session-Wiederherstellung**: Session → Session wiederherstellen (Menü)
   - Dialog zur Auswahl wiederherstellbarer Sessions
   - Validierung vor Wiederherstellung
@@ -145,6 +167,34 @@ Die Anwendung verwendet YAML-basierte Prompt-Profile für verschiedene Dokumenta
   - Python-Version, Dependencies, Config-Dateien
   - Environment-Variablen, externe Tools
   - Manuelle Validierung: `python scripts/validate_startup.py`
+
+### Export-Features
+
+- **Multi-Sprach-Export**: Export → Multi-Sprach-Export (Menü)
+  - Exportiert Dokumentation in mehreren Sprachen
+  - Automatische Übersetzung mit AI
+- **Cloud-Upload**: Export → Cloud-Upload (Menü)
+  - Lädt Dokumente in Cloud-Speicher hoch
+  - Unterstützt Google Drive, OneDrive, Dropbox
+- **Quick-Reference**: Export → Quick-Reference (Menü)
+  - Generiert kompakte Referenz-Leitfäden
+  - Ideal für Quick-Start-Guides und Cheat Sheets
+- **Video-Export**: Export → Video-Export (Menü)
+  - Erstellt Video-Walkthroughs aus Screenshots
+  - Konfigurierbare Timing und Übergänge
+- **Platform-Export**: Export → Platform-Export (Menü)
+  - Exportiert für spezifische Plattformen
+  - Unterstützt Confluence, Jira, SharePoint, WordPress
+- **Export-Filter**: Export → Export-Filter (Menü)
+  - Filtert Schritte vor dem Export
+  - Erlaubt selektive Dokumentation
+
+### Automatisierung
+
+- **App-Erkundung**: Automatisierung → App erkunden (Menü)
+  - Automatische Erkundung und Dokumentation von Anwendungen
+  - UI-Element-Erkennung
+  - Intelligente Navigation
 
 ### Datenschutz & Compliance
 

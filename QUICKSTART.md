@@ -100,11 +100,37 @@ python main.py
 
 ### Menü-Funktionen
 
+**Datei-Menü:**
+- Einstellungen: Konfiguration der Anwendung (F1)
+- Beenden: Anwendung schließen (Alt+F4)
+
 **Session-Menü:**
-- Session wiederherstellen: Stellt abgebrochene Sessions wieder her
+- Session starten: Neue Aufzeichnung beginnen (Ctrl+S)
+- Session beenden: Aufzeichnung beenden und Dokument generieren (Ctrl+Shift+S)
+- Pause/Fortsetzen: Aufzeichnung pausieren/fortsetzen (Ctrl+P)
+- Rückgängig: Letzten Schritt rückgängig machen (Ctrl+Z)
+- Wiederholen: Letzten Undo wiederholen (Ctrl+Y)
+- Session wiederherstellen: Abgebrochene Sessions wieder herstellen
+
+**Export-Menü:**
+- Multi-Sprach-Export: Dokumentation in mehreren Sprachen exportieren
+- Cloud-Upload: Dokumente in Cloud-Speicher hochladen
+- Quick-Reference: Kurze Referenz-Leitfäden generieren
+- Video-Export: Video-Walkthroughs aus Screenshots erstellen
+- Platform-Export: Für spezifische Plattformen exportieren
+- Export-Filter: Schritte vor dem Export filtern
 
 **Tools-Menü:**
 - Bereinigung ausführen: Manuelle Bereinigung alter Dateien
+- Batch-Verarbeitung: Mehrere Sessions gleichzeitig verarbeiten
+- Statistiken: Session-Statistiken anzeigen
+- Schritt-Konsolidierung: Ähnliche Schritte zusammenführen
+- Session-Vergleich: Zwei Sessions vergleichen
+- Test-Checkliste generieren: Test-Checklisten aus Schritten generieren
+- Qualitätsprüfung: Dokumentationsqualität prüfen
+
+**Automatisierung-Menü:**
+- App erkunden: Anwendung automatisch erkunden und dokumentieren
 
 **Hilfe-Menü:**
 - Tastenkürzel: Zeigt alle verfügbaren Shortcuts
@@ -145,10 +171,13 @@ python main.py
 
 ## Nächste Schritte
 
-- Lesen Sie die vollständige Dokumentation im [README.md](README.md)
+- Lesen Sie die vollständige Dokumentation im [USER_MANUAL.md](USER_MANUAL.md)
+- Lesen Sie die technische Dokumentation im [README.md](README.md)
 - Konfigurieren Sie eigene Prompt-Profile in `config/prompt_profiles/`
 - Erstellen Sie eigene Dokument-Templates in `config/document_templates/`
 - Passen Sie die Privacy-Mask an in `config/privacy_mask.yml`
+- Erweitern Sie die Funktionalität mit den erweiterten Export-Optionen
+- Nutzen Sie die Automatisierungs-Features für effiziente Dokumentation
 
 ## Support
 
