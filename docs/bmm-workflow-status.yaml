@@ -81,7 +81,7 @@ workflow_status:
 
   - id: "test-design"
     phase: 2
-    status: "recommended"
+    status: "docs/test-design-system.md"
     agent: "tea"
     command: "test-design"
     output: "System-level testability review"
