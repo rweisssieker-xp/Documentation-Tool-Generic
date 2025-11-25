@@ -91,7 +91,12 @@ class TestSessionManager:
     @patch('src.monitor.session_manager.MouseKeyboardMonitor')
     @patch('src.monitor.session_manager.ScreenshotCapture')
     @patch('src.monitor.session_manager.AuditLogger')
-    def test_init(self, mock_audit, mock_screenshot, mock_mouse, mock_action, mock_window, tmp_path):
+    @patch('src.monitor.session_manager.TextGenerator')
+    @patch('src.monitor.session_manager.OCREngine')
+    @patch('src.monitor.session_manager.PrivacyMask')
+    @patch('src.monitor.session_manager.SessionRecovery')
+    @patch('src.monitor.session_manager.TriggerConfig')
+    def test_init(self, mock_trigger, mock_recovery, mock_privacy, mock_ocr, mock_textgen, mock_audit, mock_screenshot, mock_mouse, mock_action, mock_window, tmp_path):
         """Testet Initialisierung"""
         session_id = "test_session_123"
         prompt_profile = "test_profile"
@@ -112,7 +117,12 @@ class TestSessionManager:
     @patch('src.monitor.session_manager.MouseKeyboardMonitor')
     @patch('src.monitor.session_manager.ScreenshotCapture')
     @patch('src.monitor.session_manager.AuditLogger')
-    def test_start_stop(self, mock_audit, mock_screenshot, mock_mouse, mock_action, mock_window, tmp_path):
+    @patch('src.monitor.session_manager.TextGenerator')
+    @patch('src.monitor.session_manager.OCREngine')
+    @patch('src.monitor.session_manager.PrivacyMask')
+    @patch('src.monitor.session_manager.SessionRecovery')
+    @patch('src.monitor.session_manager.TriggerConfig')
+    def test_start_stop(self, mock_trigger, mock_recovery, mock_privacy, mock_ocr, mock_textgen, mock_audit, mock_screenshot, mock_mouse, mock_action, mock_window, tmp_path):
         """Testet Start und Stop einer Session"""
         manager = SessionManager(
             session_id="test_session",
@@ -137,7 +147,12 @@ class TestSessionManager:
     @patch('src.monitor.session_manager.MouseKeyboardMonitor')
     @patch('src.monitor.session_manager.ScreenshotCapture')
     @patch('src.monitor.session_manager.AuditLogger')
-    def test_pause_resume(self, mock_audit, mock_screenshot, mock_mouse, mock_action, mock_window, tmp_path):
+    @patch('src.monitor.session_manager.TextGenerator')
+    @patch('src.monitor.session_manager.OCREngine')
+    @patch('src.monitor.session_manager.PrivacyMask')
+    @patch('src.monitor.session_manager.SessionRecovery')
+    @patch('src.monitor.session_manager.TriggerConfig')
+    def test_pause_resume(self, mock_trigger, mock_recovery, mock_privacy, mock_ocr, mock_textgen, mock_audit, mock_screenshot, mock_mouse, mock_action, mock_window, tmp_path):
         """Testet Pause und Resume"""
         manager = SessionManager(
             session_id="test_session",
@@ -162,7 +177,12 @@ class TestSessionManager:
     @patch('src.monitor.session_manager.MouseKeyboardMonitor')
     @patch('src.monitor.session_manager.ScreenshotCapture')
     @patch('src.monitor.session_manager.AuditLogger')
-    def test_get_steps(self, mock_audit, mock_screenshot, mock_mouse, mock_action, mock_window, tmp_path):
+    @patch('src.monitor.session_manager.TextGenerator')
+    @patch('src.monitor.session_manager.OCREngine')
+    @patch('src.monitor.session_manager.PrivacyMask')
+    @patch('src.monitor.session_manager.SessionRecovery')
+    @patch('src.monitor.session_manager.TriggerConfig')
+    def test_get_steps(self, mock_trigger, mock_recovery, mock_privacy, mock_ocr, mock_textgen, mock_audit, mock_screenshot, mock_mouse, mock_action, mock_window, tmp_path):
         """Testet Abrufen von Schritten"""
         manager = SessionManager(
             session_id="test_session",
@@ -187,7 +207,12 @@ class TestSessionManager:
     @patch('src.monitor.session_manager.MouseKeyboardMonitor')
     @patch('src.monitor.session_manager.ScreenshotCapture')
     @patch('src.monitor.session_manager.AuditLogger')
-    def test_undo_redo(self, mock_audit, mock_screenshot, mock_mouse, mock_action, mock_window, tmp_path):
+    @patch('src.monitor.session_manager.TextGenerator')
+    @patch('src.monitor.session_manager.OCREngine')
+    @patch('src.monitor.session_manager.PrivacyMask')
+    @patch('src.monitor.session_manager.SessionRecovery')
+    @patch('src.monitor.session_manager.TriggerConfig')
+    def test_undo_redo(self, mock_trigger, mock_recovery, mock_privacy, mock_ocr, mock_textgen, mock_audit, mock_screenshot, mock_mouse, mock_action, mock_window, tmp_path):
         """Testet Undo/Redo-Funktionalität"""
         manager = SessionManager(
             session_id="test_session",
@@ -222,7 +247,12 @@ class TestSessionManager:
     @patch('src.monitor.session_manager.MouseKeyboardMonitor')
     @patch('src.monitor.session_manager.ScreenshotCapture')
     @patch('src.monitor.session_manager.AuditLogger')
-    def test_get_session_statistics(self, mock_audit, mock_screenshot, mock_mouse, mock_action, mock_window, tmp_path):
+    @patch('src.monitor.session_manager.TextGenerator')
+    @patch('src.monitor.session_manager.OCREngine')
+    @patch('src.monitor.session_manager.PrivacyMask')
+    @patch('src.monitor.session_manager.SessionRecovery')
+    @patch('src.monitor.session_manager.TriggerConfig')
+    def test_get_session_statistics(self, mock_trigger, mock_recovery, mock_privacy, mock_ocr, mock_textgen, mock_audit, mock_screenshot, mock_mouse, mock_action, mock_window, tmp_path):
         """Testet Session-Statistiken"""
         manager = SessionManager(
             session_id="test_session",

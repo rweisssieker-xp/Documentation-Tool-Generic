@@ -142,15 +142,13 @@ class TestOpenAIClient:
 class TestPromptTemplateSystem:
     """Tests für PromptTemplateSystem"""
     
-    def test_load_profile(self, tmp_path):
+    @patch('src.ai.prompt_templates.ConfigManager')
+    def test_load_profile(self, mock_config_manager, tmp_path):
         """Testet Laden eines Prompt-Profils"""
         import yaml
         
-        # Erstelle Test-Profil
-        profile_dir = tmp_path / "profiles"
-        profile_dir.mkdir(parents=True)
-        profile_file = profile_dir / "test.yml"
-        
+        # Mock ConfigManager
+        mock_config_instance = MagicMock()
         profile_data = {
             'language': 'de',
             'style': 'technical',
@@ -159,15 +157,14 @@ class TestPromptTemplateSystem:
             'introduction_template': 'Introduction: {steps}',
             'conclusion_template': 'Conclusion: {steps}'
         }
-        profile_file.write_text(yaml.dump(profile_data))
+        mock_config_instance.load_prompt_profile.return_value = profile_data
+        mock_config_manager.return_value = mock_config_instance
         
-        with patch('src.ai.prompt_templates.Path') as mock_path:
-            mock_path.return_value = profile_dir
-            system = PromptTemplateSystem()
-            system.load_profile('test')
-            
-            assert system.get_language() == 'de'
-            assert system.get_style() == 'technical'
+        system = PromptTemplateSystem()
+        system.load_profile('test')
+        
+        assert system.current_profile['language'] == 'de'
+        assert system.current_profile['style'] == 'technical'
     
     @patch('src.ai.prompt_templates.ConfigManager')
     def test_format_step_prompt(self, mock_config_manager):
