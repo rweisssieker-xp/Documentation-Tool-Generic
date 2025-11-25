@@ -104,7 +104,7 @@ class TestCompliance:
         test_file = tmp_path / "test_file.txt"
         test_file.write_text("Test content")
         
-        hash_value = Compliance.calculate_hash(test_file)
+        hash_value = Compliance.calculate_sha256(test_file)
         
         # Berechne erwarteten Hash
         expected_hash = hashlib.sha256(test_file.read_bytes()).hexdigest()

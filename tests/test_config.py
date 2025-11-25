@@ -24,43 +24,48 @@ class TestConfigManager:
     def test_list_prompt_profiles(self, tmp_path):
         """Testet das Auflisten von Prompt-Profilen"""
         # Erstelle temporäres Config-Verzeichnis
-        config_dir = tmp_path / "config" / "prompt_profiles"
-        config_dir.mkdir(parents=True)
+        config_dir = tmp_path / "config"
+        prompt_profiles_dir = config_dir / "prompt_profiles"
+        prompt_profiles_dir.mkdir(parents=True)
         
         # Erstelle Test-Profil
-        test_profile = config_dir / "test.yml"
+        test_profile = prompt_profiles_dir / "test.yml"
         test_profile.write_text(yaml.dump({
             'language': 'de',
-            'style': 'technical'
+            'style': 'technical',
+            'system_prompt': 'Test',
+            'step_template': 'Step {step_number}',
+            'introduction_template': 'Intro',
+            'conclusion_template': 'Conclusion'
         }))
         
-        with patch('src.config.config_manager.Path') as mock_path:
-            mock_path.return_value = config_dir
-            manager = ConfigManager()
-            profiles = manager.list_prompt_profiles()
-            
-            assert 'test' in profiles
+        manager = ConfigManager(config_dir=config_dir)
+        profiles = manager.list_prompt_profiles()
+        
+        assert 'test' in profiles
     
     def test_load_prompt_profile(self, tmp_path):
         """Testet das Laden eines Prompt-Profils"""
-        config_dir = tmp_path / "config" / "prompt_profiles"
-        config_dir.mkdir(parents=True)
+        config_dir = tmp_path / "config"
+        prompt_profiles_dir = config_dir / "prompt_profiles"
+        prompt_profiles_dir.mkdir(parents=True)
         
-        test_profile = config_dir / "test.yml"
+        test_profile = prompt_profiles_dir / "test.yml"
         test_data = {
             'language': 'de',
             'style': 'technical',
-            'system_prompt': 'Test prompt'
+            'system_prompt': 'Test prompt',
+            'step_template': 'Step {step_number}',
+            'introduction_template': 'Intro',
+            'conclusion_template': 'Conclusion'
         }
         test_profile.write_text(yaml.dump(test_data))
         
-        with patch('src.config.config_manager.Path') as mock_path:
-            mock_path.return_value = config_dir
-            manager = ConfigManager()
-            profile = manager.load_prompt_profile('test')
-            
-            assert profile['language'] == 'de'
-            assert profile['style'] == 'technical'
+        manager = ConfigManager(config_dir=config_dir)
+        profile = manager.load_prompt_profile('test')
+        
+        assert profile['language'] == 'de'
+        assert profile['style'] == 'technical'
 
 
 class TestConfigValidator:
@@ -143,7 +148,7 @@ class TestTriggerConfig:
         config = TriggerConfig()
         config.poll_interval = 3.0
         
-        config.save(config_file)
+        config.save_config(config_file)
         
         assert config_file.exists()
         loaded_config = TriggerConfig(config_file)

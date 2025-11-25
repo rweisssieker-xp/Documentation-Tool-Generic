@@ -3,9 +3,11 @@ Compliance-Modul für SHA-256 und Zeitstempel
 """
 
 import hashlib
+import os
+import platform
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Dict
 
 
 class Compliance:
@@ -66,5 +68,18 @@ class Compliance:
         """
         actual_hash = Compliance.calculate_sha256(file_path)
         return actual_hash == expected_hash
+    
+    @staticmethod
+    def get_user_info() -> Dict[str, str]:
+        """
+        Gibt Benutzerinformationen zurück
+        
+        Returns:
+            Dictionary mit username und system_name
+        """
+        return {
+            'username': os.getenv('USERNAME', os.getenv('USER', 'unknown')),
+            'system_name': platform.node()
+        }
 
 

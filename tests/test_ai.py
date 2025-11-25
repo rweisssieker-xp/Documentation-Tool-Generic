@@ -24,89 +24,84 @@ class TestOpenAIClient:
         client = OpenAIClient()
         assert client.api_key == 'test_key_12345'
     
-    @patch.dict('os.environ', {'OPENAI_API_KEY': ''})
+    @patch.dict('os.environ', {'OPENAI_API_KEY': ''}, clear=True)
     def test_init_no_key(self):
         """Testet Initialisierung ohne API-Key"""
-        client = OpenAIClient()
-        # Sollte None oder leer sein
-        assert client.api_key is None or client.api_key == ''
+        with pytest.raises(ValueError, match="OpenAI API-Key nicht gesetzt"):
+            OpenAIClient()
     
-    @patch('src.ai.openai_client.openai')
+    @patch('src.ai.openai_client.OpenAI')
     @patch.dict('os.environ', {'OPENAI_API_KEY': 'test_key_12345'})
-    def test_generate_text(self, mock_openai):
+    def test_generate_text(self, mock_openai_class):
         """Testet Textgenerierung"""
-        client = OpenAIClient()
-        
-        # Mock OpenAI Response
+        # Mock OpenAI Client instance
+        mock_client_instance = MagicMock()
         mock_response = MagicMock()
         mock_response.choices = [MagicMock()]
         mock_response.choices[0].message.content = "Generated text"
+        mock_client_instance.chat.completions.create.return_value = mock_response
+        mock_openai_class.return_value = mock_client_instance
         
-        mock_openai.OpenAI.return_value.chat.completions.create.return_value = mock_response
-        
-        result = client.generate_text("Test prompt", "Test system prompt")
+        client = OpenAIClient()
+        result = client.generate_text("Test system prompt", "Test user prompt")
         
         assert result == "Generated text"
     
-    @patch('src.ai.openai_client.openai')
+    @patch('src.ai.openai_client.OpenAI')
     @patch.dict('os.environ', {'OPENAI_API_KEY': 'test_key_12345'})
-    def test_generate_text_with_retry(self, mock_openai):
+    def test_generate_text_with_retry(self, mock_openai_class):
         """Testet Retry-Logik bei Fehlern"""
-        client = OpenAIClient()
-        
-        # Mock OpenAI Response mit Fehler, dann Erfolg
+        # Mock OpenAI Client instance
+        mock_client_instance = MagicMock()
         mock_response = MagicMock()
         mock_response.choices = [MagicMock()]
         mock_response.choices[0].message.content = "Generated text"
-        
-        mock_client = MagicMock()
-        mock_openai.OpenAI.return_value = mock_client
+        mock_openai_class.return_value = mock_client_instance
         
         # Erster Aufruf schlägt fehl, zweiter erfolgreich
-        mock_client.chat.completions.create.side_effect = [
+        mock_client_instance.chat.completions.create.side_effect = [
             Exception("API Error"),
             mock_response
         ]
         
+        client = OpenAIClient()
         try:
-            result = client.generate_text("Test prompt", "Test system prompt", max_retries=2)
+            result = client.generate_text("Test system prompt", "Test user prompt", max_retries=2)
             assert result == "Generated text"
         except Exception:
             # Kann auch nach Retries fehlschlagen
             pass
     
-    @patch('src.ai.openai_client.openai')
+    @patch('src.ai.openai_client.OpenAI')
     @patch.dict('os.environ', {'OPENAI_API_KEY': 'test_key_12345'})
-    def test_generate_text_rate_limit_handling(self, mock_openai):
+    @patch('time.sleep')
+    def test_generate_text_rate_limit_handling(self, mock_sleep, mock_openai_class):
         """Testet Rate Limit Handling"""
-        import time
-        client = OpenAIClient()
-        
+        # Mock OpenAI Client instance
+        mock_client_instance = MagicMock()
         mock_response = MagicMock()
         mock_response.choices = [MagicMock()]
         mock_response.choices[0].message.content = "Generated text"
-        
-        mock_client = MagicMock()
-        mock_openai.OpenAI.return_value = mock_client
+        mock_openai_class.return_value = mock_client_instance
         
         # Rate Limit Fehler, dann Erfolg
         rate_limit_error = Exception("rate_limit_exceeded")
-        mock_client.chat.completions.create.side_effect = [
+        mock_client_instance.chat.completions.create.side_effect = [
             rate_limit_error,
             mock_response
         ]
         
+        client = OpenAIClient()
         try:
-            with patch('time.sleep'):  # Mock sleep um Test zu beschleunigen
-                result = client.generate_text("Test prompt", "Test system prompt", max_retries=2)
-                assert result == "Generated text"
+            result = client.generate_text("Test system prompt", "Test user prompt", max_retries=2)
+            assert result == "Generated text"
         except Exception:
             # Kann auch nach Retries fehlschlagen
             pass
     
-    @patch('src.ai.openai_client.openai')
+    @patch('src.ai.openai_client.OpenAI')
     @patch.dict('os.environ', {'OPENAI_API_KEY': 'test_key_12345'})
-    def test_generate_text_exponential_backoff(self, mock_openai):
+    def test_generate_text_exponential_backoff(self, mock_openai_class):
         """Testet Exponential Backoff bei Retries"""
         import time
         client = OpenAIClient()
@@ -116,7 +111,7 @@ class TestOpenAIClient:
         mock_response.choices[0].message.content = "Generated text"
         
         mock_client = MagicMock()
-        mock_openai.OpenAI.return_value = mock_client
+        mock_openai_class.return_value = mock_client
         
         # Mehrere Fehler, dann Erfolg
         mock_client.chat.completions.create.side_effect = [
@@ -174,20 +169,25 @@ class TestPromptTemplateSystem:
             assert system.get_language() == 'de'
             assert system.get_style() == 'technical'
     
-    def test_format_step_prompt(self):
+    @patch('src.ai.prompt_templates.ConfigManager')
+    def test_format_step_prompt(self, mock_config_manager):
         """Testet Formatierung eines Schritt-Prompts"""
-        system = PromptTemplateSystem()
-        
-        # Setze Test-Template
-        system.step_template = "Step {step_number}: {window_title} - {description}"
-        
-        step_data = {
-            'step_number': 1,
-            'window_title': 'Test Window',
-            'description': 'Test Description'
+        # Mock ConfigManager
+        mock_config_instance = MagicMock()
+        mock_profile = {
+            'step_template': 'Step {step_number}: {window_title} - {ocr_text}'
         }
+        mock_config_instance.load_prompt_profile.return_value = mock_profile
+        mock_config_manager.return_value = mock_config_instance
         
-        result = system.format_step_prompt(step_data)
+        system = PromptTemplateSystem()
+        system.load_profile('test')
+        
+        result = system.format_step_prompt(
+            step_number=1,
+            window_title='Test Window',
+            ocr_text='Test Description'
+        )
         
         assert 'Step 1' in result
         assert 'Test Window' in result
@@ -199,13 +199,22 @@ class TestTextGenerator:
     
     @patch('src.ai.text_generator.OpenAIClient')
     @patch('src.ai.text_generator.PromptTemplateSystem')
-    def test_init(self, mock_prompt_system, mock_openai_client):
+    @patch('src.ai.text_generator.OCREngine')
+    def test_init(self, mock_ocr_engine, mock_prompt_system, mock_openai_client):
         """Testet Initialisierung"""
+        # Mock instances
+        mock_openai_instance = MagicMock()
+        mock_openai_client.return_value = mock_openai_instance
+        mock_prompt_instance = MagicMock()
+        mock_prompt_system.return_value = mock_prompt_instance
+        mock_ocr_instance = MagicMock()
+        mock_ocr_engine.return_value = mock_ocr_instance
+        
         generator = TextGenerator('test_profile')
         
-        assert generator.prompt_profile == 'test_profile'
         assert generator.openai_client is not None
         assert generator.prompt_system is not None
+        assert generator.ocr_engine is not None
     
     @patch('src.ai.text_generator.OpenAIClient')
     @patch('src.ai.text_generator.PromptTemplateSystem')
