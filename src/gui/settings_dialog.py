@@ -6,6 +6,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import os
 from pathlib import Path
+import yaml
 from dotenv import load_dotenv
 
 from src.config.config_manager import ConfigManager

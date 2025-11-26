@@ -105,6 +105,7 @@ class HTMLExporter:
         # Schritte
         for step in steps:
             step_number = step.get('step_number', 0)
+            step_id = f"step-{step_number}"  # Definiere step_id immer am Anfang
             window_title = step.get('window_title', 'Unbekannt')
             description = step.get('description', '')
             
@@ -115,7 +116,6 @@ class HTMLExporter:
             if include_screenshots:
                 screenshot_path = step.get('screenshot_path', '')
                 if screenshot_path and Path(screenshot_path).exists():
-                    step_id = f"step-{step_number}"
                     if embed_images:
                         img_data = self._embed_image(screenshot_path)
                         html_parts.append(f'<div class="screenshot-container">\n')

@@ -151,10 +151,10 @@ class AppSelectorDialog:
                 
                 # Update UI im Hauptthread
                 self.dialog.after(0, lambda: self._populate_tree(grouped))
-            except Exception as e:
-                logger.error(f"Fehler beim Laden der Fenster: {e}", exc_info=True)
-                self.dialog.after(0, lambda: self.info_label.config(
-                    text=f"Fehler beim Laden: {str(e)}",
+            except Exception as err:
+                logger.error(f"Fehler beim Laden der Fenster: {err}", exc_info=True)
+                self.dialog.after(0, lambda err=err: self.info_label.config(
+                    text=f"Fehler beim Laden: {str(err)}",
                     foreground="red"
                 ))
         

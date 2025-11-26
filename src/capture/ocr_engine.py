@@ -108,7 +108,7 @@ class OCREngine:
                 logger.warning(f"Screenshot nicht gefunden: {image_path}")
                 return ""
             
-            start_time = time.time()
+            start_time = time.perf_counter()
             
             img = Image.open(image_path)
             
@@ -118,11 +118,17 @@ class OCREngine:
             # OCR mit konfigurierter Sprache
             text = pytesseract.image_to_string(img, lang=self.language, timeout=int(timeout))
             
-            duration = time.time() - start_time
+            duration = time.perf_counter() - start_time
+            duration_ms = duration * 1000
+            target_ms = timeout * 1000  # 2s = 2000ms
+            
             if duration > timeout:
-                logger.warning(f"OCR-Verarbeitung dauerte {duration:.2f}s (Target: {timeout}s)")
+                logger.warning(f"OCR-Verarbeitung dauerte {duration:.2f}s ({duration_ms:.2f}ms, Target: {timeout}s/{target_ms:.0f}ms)")
             else:
-                logger.debug(f"OCR-Verarbeitung abgeschlossen in {duration:.2f}s")
+                logger.debug(f"OCR-Verarbeitung abgeschlossen in {duration:.2f}s ({duration_ms:.2f}ms)")
+            
+            # Speichere Performance-Metriken im Text-Objekt (wird später in Metadaten übernommen)
+            # Für jetzt geben wir nur Text zurück, Metriken werden in SessionManager gespeichert
             
             return text.strip()
         

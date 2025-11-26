@@ -76,6 +76,9 @@ class ScreenshotCapture:
         """
         Windows-specific window capture
         """
+        # Performance-Messung: Start-Zeit für 100ms-Target
+        capture_start_time = time.perf_counter()
+        
         for attempt in range(max_retries + 1):
             try:
                 if hwnd is None:
@@ -130,6 +133,9 @@ class ScreenshotCapture:
                 screenshot_path = self.output_dir / filename
                 img.save(screenshot_path, 'PNG')
                 
+                # Performance-Messung: Berechne Dauer
+                capture_duration_ms = (time.perf_counter() - capture_start_time) * 1000
+                
                 # Erstelle Metadaten-Dict
                 metadata = {
                     'screenshot_id': screenshot_id,
@@ -137,8 +143,19 @@ class ScreenshotCapture:
                     'window_title': window_title,
                     'file_path': str(screenshot_path),
                     'step_number': step_number,
-                    'session_id': session_id
+                    'session_id': session_id,
+                    'performance': {
+                        'capture_duration_ms': round(capture_duration_ms, 2),
+                        'target_ms': 100,
+                        'within_target': capture_duration_ms <= 100
+                    }
                 }
+                
+                # Log Performance-Warnung falls Target überschritten
+                if capture_duration_ms > 100:
+                    logger.warning(f"Screenshot-Capture dauerte {capture_duration_ms:.2f}ms (Target: 100ms)")
+                else:
+                    logger.debug(f"Screenshot-Capture abgeschlossen in {capture_duration_ms:.2f}ms")
                 
                 # Wende Privacy-Mask an falls aktiviert (ohne OCR-Text hier, wird später angewendet)
                 # Die automatische Erkennung wird später im SessionManager mit OCR-Text aufgerufen
@@ -165,6 +182,9 @@ class ScreenshotCapture:
         """
         Cross-platform window capture using pywinctl and mss
         """
+        # Performance-Messung: Start-Zeit für 100ms-Target
+        capture_start_time = time.perf_counter()
+        
         for attempt in range(max_retries + 1):
             try:
                 from mss import mss
@@ -249,6 +269,9 @@ class ScreenshotCapture:
                 screenshot_path = self.output_dir / filename
                 img.save(screenshot_path, 'PNG')
                 
+                # Performance-Messung: Berechne Dauer
+                capture_duration_ms = (time.perf_counter() - capture_start_time) * 1000
+                
                 # Erstelle Metadaten-Dict
                 metadata = {
                     'screenshot_id': screenshot_id,
@@ -256,8 +279,19 @@ class ScreenshotCapture:
                     'window_title': window_title,
                     'file_path': str(screenshot_path),
                     'step_number': step_number,
-                    'session_id': session_id
+                    'session_id': session_id,
+                    'performance': {
+                        'capture_duration_ms': round(capture_duration_ms, 2),
+                        'target_ms': 100,
+                        'within_target': capture_duration_ms <= 100
+                    }
                 }
+                
+                # Log Performance-Warnung falls Target überschritten
+                if capture_duration_ms > 100:
+                    logger.warning(f"Screenshot-Capture dauerte {capture_duration_ms:.2f}ms (Target: 100ms)")
+                else:
+                    logger.debug(f"Screenshot-Capture abgeschlossen in {capture_duration_ms:.2f}ms")
                 
                 return (screenshot_path, metadata)
             
@@ -271,16 +305,20 @@ class ScreenshotCapture:
         
         return None
     
-    def capture_screen(self, step_number: Optional[int] = None) -> Optional[Path]:
+    def capture_screen(self, step_number: Optional[int] = None, session_id: Optional[str] = None) -> Optional[Tuple[Path, Dict]]:
         """
         Erstellt einen Screenshot des gesamten Bildschirms
         
         Args:
             step_number: Schrittnummer für Dateinamen
+            session_id: Session-ID für Dateinamen (optional)
             
         Returns:
-            Pfad zum erstellten Screenshot oder None bei Fehler
+            Tuple (Pfad zum Screenshot, Metadaten-Dict) oder None bei Fehler
         """
+        # Performance-Messung: Start-Zeit für 100ms-Target
+        capture_start_time = time.perf_counter()
+        
         try:
             from mss import mss
             

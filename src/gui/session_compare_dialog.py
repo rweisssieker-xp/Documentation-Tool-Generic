@@ -262,9 +262,9 @@ class SessionCompareDialog:
             # Update UI im Hauptthread
             self.dialog.after(0, lambda: self._display_comparison(comparison))
         
-        except Exception as e:
-            logger.error(f"Fehler beim Session-Vergleich: {e}", exc_info=True)
-            self.dialog.after(0, lambda: messagebox.showerror("Fehler", f"Vergleich fehlgeschlagen:\n{str(e)}"))
+        except Exception as err:
+            logger.error(f"Fehler beim Session-Vergleich: {err}", exc_info=True)
+            self.dialog.after(0, lambda err=err: messagebox.showerror("Fehler", f"Vergleich fehlgeschlagen:\n{str(err)}"))
     
     def _display_comparison(self, comparison: Dict):
         """Zeigt Vergleichs-Ergebnisse an"""
@@ -367,9 +367,9 @@ class SessionCompareDialog:
             # Update UI im Hauptthread
             self.dialog.after(0, lambda: self._diff_generated(result_path))
         
-        except Exception as e:
-            logger.error(f"Fehler bei Diff-Dokument-Generierung: {e}", exc_info=True)
-            self.dialog.after(0, lambda: messagebox.showerror("Fehler", f"Generierung fehlgeschlagen:\n{str(e)}"))
+        except Exception as err:
+            logger.error(f"Fehler bei Diff-Dokument-Generierung: {err}", exc_info=True)
+            self.dialog.after(0, lambda err=err: messagebox.showerror("Fehler", f"Generierung fehlgeschlagen:\n{str(err)}"))
     
     def _diff_generated(self, output_path: Path):
         """Wird aufgerufen wenn Diff-Dokument erstellt wurde"""

@@ -268,7 +268,7 @@ class PlatformExportDialog:
         
         except Exception as e:
             logger.error(f"Fehler beim Platform-Export: {e}", exc_info=True)
-            self.dialog.after(0, lambda: self._export_failed(str(e)))
+            self.dialog.after(0, lambda err=e: self._export_failed(str(err)))
     
     def _export_completed(self, result: Dict):
         """Wird aufgerufen wenn Export abgeschlossen ist"""

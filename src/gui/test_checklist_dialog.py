@@ -186,9 +186,9 @@ class TestChecklistDialog:
             # Update UI im Hauptthread
             self.dialog.after(0, lambda: self._generation_completed(result_path))
         
-        except Exception as e:
-            logger.error(f"Fehler beim Generieren der Test-Checkliste: {e}", exc_info=True)
-            self.dialog.after(0, lambda: self._generation_failed(str(e)))
+        except Exception as err:
+            logger.error(f"Fehler beim Generieren der Test-Checkliste: {err}", exc_info=True)
+            self.dialog.after(0, lambda err=err: self._generation_failed(str(err)))
     
     def _generation_completed(self, output_path: Path):
         """Wird aufgerufen wenn Generierung abgeschlossen ist"""

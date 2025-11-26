@@ -238,9 +238,9 @@ class VideoExportDialog:
             # Update UI im Hauptthread
             self.dialog.after(0, lambda: self._export_completed(result_path))
         
-        except Exception as e:
-            logger.error(f"Fehler beim Video-Export: {e}", exc_info=True)
-            self.dialog.after(0, lambda: self._export_failed(str(e)))
+        except Exception as err:
+            logger.error(f"Fehler beim Video-Export: {err}", exc_info=True)
+            self.dialog.after(0, lambda err=err: self._export_failed(str(err)))
     
     def _export_completed(self, output_path: Path):
         """Wird aufgerufen wenn Export abgeschlossen ist"""

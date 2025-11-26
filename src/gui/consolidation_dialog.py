@@ -170,9 +170,9 @@ class ConsolidationDialog:
             # Update UI im Hauptthread
             self.dialog.after(0, self._update_suggestions_list)
         
-        except Exception as e:
-            logger.error(f"Fehler bei Schritt-Analyse: {e}", exc_info=True)
-            self.dialog.after(0, lambda: messagebox.showerror("Fehler", f"Analyse fehlgeschlagen:\n{str(e)}"))
+        except Exception as err:
+            logger.error(f"Fehler bei Schritt-Analyse: {err}", exc_info=True)
+            self.dialog.after(0, lambda err=err: messagebox.showerror("Fehler", f"Analyse fehlgeschlagen:\n{str(err)}"))
     
     def _update_suggestions_list(self):
         """Aktualisiert die Vorschläge-Liste"""

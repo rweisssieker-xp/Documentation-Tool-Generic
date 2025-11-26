@@ -189,7 +189,7 @@ class MultiLangExportDialog:
         
         except Exception as e:
             logger.error(f"Fehler beim Multi-Sprach-Export: {e}", exc_info=True)
-            self.dialog.after(0, lambda: self._export_failed(str(e)))
+            self.dialog.after(0, lambda err=e: self._export_failed(str(err)))
     
     def _export_completed(self, exported_files: Dict[str, Path]):
         """Wird aufgerufen wenn Export abgeschlossen ist"""

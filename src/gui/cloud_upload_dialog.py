@@ -213,7 +213,7 @@ class CloudUploadDialog:
             failed = []
             
             for i, file_path in enumerate(self.file_paths):
-                self.dialog.after(0, lambda i=i: self.progress_var.set(f"Lade hoch: {file_paths[i].name}"))
+                self.dialog.after(0, lambda i=i, fp=file_path: self.progress_var.set(f"Lade hoch: {fp.name}"))
                 self.dialog.after(0, lambda i=i: self.progress_bar.config(value=i))
                 
                 try:
@@ -251,9 +251,9 @@ class CloudUploadDialog:
             # Update UI im Hauptthread
             self.dialog.after(0, lambda: self._upload_completed(successful, failed))
         
-        except Exception as e:
-            logger.error(f"Fehler beim Cloud-Upload: {e}", exc_info=True)
-            self.dialog.after(0, lambda: self._upload_failed(str(e)))
+        except Exception as err:
+            logger.error(f"Fehler beim Cloud-Upload: {err}", exc_info=True)
+            self.dialog.after(0, lambda err=err: self._upload_failed(str(err)))
     
     def _upload_completed(self, successful: List[str], failed: List[dict]):
         """Wird aufgerufen wenn Upload abgeschlossen ist"""

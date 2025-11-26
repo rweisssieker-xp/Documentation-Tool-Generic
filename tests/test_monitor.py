@@ -260,7 +260,8 @@ class TestSessionManager:
             output_dir=tmp_path
         )
         
-        manager.session_start_time = time.time() - 120  # 2 Minuten vorher
+        from datetime import datetime, timedelta
+        manager.session_start_time = datetime.now() - timedelta(seconds=120)  # 2 Minuten vorher
         
         # Füge Test-Schritte hinzu
         manager.steps = [

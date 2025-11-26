@@ -26,6 +26,7 @@ from src.gui.test_checklist_dialog import TestChecklistDialog
 from src.gui.app_selector_dialog import AppSelectorDialog
 from src.gui.exploration_progress_dialog import ExplorationProgressDialog
 from src.gui.progress_dialog import ProgressDialog
+from src.gui.platform_export_dialog import PlatformExportDialog
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -667,9 +668,9 @@ Für weitere Informationen siehe README.md
                     
                     # Schließe Dialog und zeige Fehlermeldung
                     self.root.after(0, lambda: progress_dialog.close())
-                    self.root.after(0, lambda: messagebox.showerror(
+                    self.root.after(0, lambda err=e: messagebox.showerror(
                         "Fehler",
-                        f"Fehler bei der Dokumentgenerierung:\n{str(e)}\n\nÜberprüfen Sie die Logs für Details."
+                        f"Fehler bei der Dokumentgenerierung:\n{str(err)}\n\nÜberprüfen Sie die Logs für Details."
                     ))
             
             # Starte Thread für Generierung
@@ -1244,11 +1245,11 @@ Für weitere Informationen siehe README.md
             def start_exploration():
                 try:
                     exploration_session.start()
-                except Exception as e:
-                    logger.error(f"Fehler bei Erkundung: {e}", exc_info=True)
-                    self.root.after(0, lambda: messagebox.showerror(
+                except Exception as err:
+                    logger.error(f"Fehler bei Erkundung: {err}", exc_info=True)
+                    self.root.after(0, lambda err=err: messagebox.showerror(
                         "Fehler",
-                        f"Fehler bei Erkundung:\n\n{str(e)}\n\nDetails finden Sie in der Logdatei unter 'logs/ahg.log'."
+                        f"Fehler bei Erkundung:\n\n{str(err)}\n\nDetails finden Sie in der Logdatei unter 'logs/ahg.log'."
                     ))
                     self.root.after(0, progress_dialog.dialog.destroy)
             

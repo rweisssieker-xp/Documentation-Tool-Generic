@@ -4,6 +4,7 @@ Textgenerierung mit OpenAI und Kontext
 
 from typing import List, Dict, Optional
 from pathlib import Path
+import time
 
 from src.ai.openai_client import OpenAIClient
 from src.ai.prompt_templates import PromptTemplateSystem
@@ -45,6 +46,9 @@ class TextGenerator:
             Generierte Beschreibung
         """
         try:
+            # Performance-Messung: Start-Zeit für 5s-Target
+            generation_start_time = time.perf_counter()
+            
             # Verwende OCR-Text aus Step falls bereits vorhanden, sonst extrahiere
             ocr_text = step.get('ocr_text', '')
             if not ocr_text:
@@ -73,6 +77,16 @@ class TextGenerator:
                 max_retries=3,
                 retry_delay=1.0
             )
+            
+            # Performance-Messung: Berechne Dauer
+            generation_duration = time.perf_counter() - generation_start_time
+            generation_duration_ms = generation_duration * 1000
+            target_ms = 5000  # 5s = 5000ms
+            
+            if generation_duration > 5.0:
+                logger.warning(f"AI-Textgenerierung dauerte {generation_duration:.2f}s ({generation_duration_ms:.2f}ms, Target: 5s/{target_ms:.0f}ms)")
+            else:
+                logger.debug(f"AI-Textgenerierung abgeschlossen in {generation_duration:.2f}s ({generation_duration_ms:.2f}ms)")
             
             return description
         
