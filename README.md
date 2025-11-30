@@ -14,6 +14,16 @@ Vollautomatische Erstellung bebilderter technischer Handbücher aus realen Nutzu
 - **Erweiterte Export-Optionen**: Multi-Sprach-Export, Cloud-Upload, Quick-Reference, Video-Export, Platform-Export
 - **Automatisierungs-Features**: Automatische App-Erkundung und Dokumentation
 
+### 🚀 Innovation Features (v1.1)
+
+- **Voice-First Documentation**: Hands-free Dokumentation per Sprachsteuerung mit OpenAI Whisper
+- **Multi-Modal Knowledge Base**: Semantische Suche mit RAG (Retrieval-Augmented Generation)
+- **Predictive Documentation**: KI-gestützte Vorhersage nächster Dokumentationsschritte
+- **Smart Context Capture**: Erweitertes Monitoring von Clipboard, Tabs und Anwendungskontext
+- **Automated Test Generation**: Export dokumentierter Workflows als Selenium/Playwright/Gherkin Tests
+- **Interactive Tutorial Generator**: Konvertierung von Dokumentation in SCORM-kompatible interaktive Tutorials
+- **Process Mining Engine**: Analyse und BPMN-Export von Benutzer-Sessions
+
 ## Schnellstart
 
 Für eine schnelle Einführung siehe [QUICKSTART.md](QUICKSTART.md)
@@ -90,12 +100,37 @@ Documentation-Tool-Generic/
 │   ├── ai/                # OpenAI-Integration
 │   ├── document/          # Dokumentgenerierung
 │   ├── audit/             # Audit-Trail
-│   └── config/            # Konfiguration
+│   ├── config/            # Konfiguration
+│   │
+│   │  --- Innovation Features (v1.1) ---
+│   ├── voice/             # Voice-First Documentation
+│   ├── knowledge/         # Knowledge Base + RAG
+│   ├── prediction/        # Predictive Assistant
+│   ├── context/           # Smart Context Capture
+│   ├── testgen/           # Test Case Generator
+│   ├── tutorial/          # Tutorial Generator
+│   └── processmining/     # Process Mining Engine
+│
 ├── data/                  # Datenverzeichnis
 │   ├── sessions/          # Session-Daten
 │   ├── screenshots/       # Screenshots
-│   └── output/            # Generierte Dokumente
-└── config/                # Prompt-Profile
+│   ├── output/            # Generierte Dokumente
+│   ├── knowledge_base/    # Knowledge Base Speicher
+│   ├── embeddings/        # Vector Embeddings
+│   ├── voice_recordings/  # Sprachaufnahmen
+│   ├── tutorials/         # Generierte Tutorials
+│   ├── generated_tests/   # Generierte Testfälle
+│   └── process_models/    # BPMN Prozessmodelle
+│
+├── config/                # Konfiguration
+│   ├── prompt_profiles/   # Prompt-Profile
+│   └── innovation_config.yaml  # Innovation Features Config
+│
+├── cli/                   # Command-Line Interface
+│   └── innovation_cli.py  # CLI für Innovation Features
+│
+└── examples/              # Beispiele
+    └── demo_all_features.py  # Full Demo
 ```
 
 ## Prompt-Profile
@@ -195,6 +230,58 @@ Die Anwendung verwendet YAML-basierte Prompt-Profile für verschiedene Dokumenta
   - Automatische Erkundung und Dokumentation von Anwendungen
   - UI-Element-Erkennung
   - Intelligente Navigation
+
+### 🚀 Innovation Features (v1.1)
+
+#### Voice-First Documentation
+Dokumentieren Sie freihändig per Sprachsteuerung:
+- **Aktivierung**: Tools → Voice-First Panel (`Ctrl+Alt+V`)
+- **Sprachen**: Deutsch und Englisch
+- **Sprachbefehle**: "Nächster Schritt", "Screenshot", "Pause", etc.
+- **AI-Backend**: OpenAI Whisper für hochpräzise Spracherkennung
+
+#### Multi-Modal Knowledge Base
+Zentralisierte Wissensbasis mit semantischer Suche:
+- **Aktivierung**: Tools → Knowledge Base (`Ctrl+Alt+K`)
+- **Suche**: Keyword + semantische Hybrid-Suche
+- **RAG**: KI-gestützte Antworten basierend auf Ihrer Dokumentation
+- **Backend**: ChromaDB für Vektor-Embeddings
+
+#### Predictive Documentation
+KI-Assistent für optimierte Dokumentation:
+- Vorhersage des nächsten wahrscheinlichen Schritts
+- Lücken-Analyse für vollständige Dokumentation
+- Auto-Completion für Schrittbeschreibungen
+- Workflow-Pattern-Learning
+
+#### Smart Context Capture
+Erweitertes Kontext-Monitoring:
+- Clipboard-Überwachung (Kopierte Texte/Bilder)
+- Browser-Tab-Tracking (Chrome, Firefox, Edge)
+- Intent-Analyse mittels GPT-4o
+- Context Cloud für zentrale Speicherung
+
+#### Test Case Generator
+Export dokumentierter Workflows als ausführbare Tests:
+- **Aktivierung**: Export → Test Case Export (`Ctrl+Alt+T`)
+- **Frameworks**: Selenium, Playwright, Gherkin/BDD
+- **Sprachen**: Python, TypeScript
+- **Features**: Smart Selector Generation, Fallback-Strategien
+
+#### Tutorial Generator
+Konvertierung von Dokumentation in interaktive Tutorials:
+- **Aktivierung**: Export → Tutorial Export (`Ctrl+Alt+U`)
+- **Format**: HTML5 interaktiv mit Navigation
+- **SCORM**: 2004 4th Edition für LMS-Integration
+- **Quizzes**: Automatisch generierte Verständnisfragen
+
+#### Process Mining Engine
+Analyse und Visualisierung von Benutzer-Prozessen:
+- **Aktivierung**: Tools → Process Mining (`Ctrl+Alt+M`)
+- **Discovery**: Automatische Prozess-Erkennung aus Sessions
+- **Patterns**: Erkennung wiederkehrender Muster
+- **Varianten**: Analyse verschiedener Prozess-Varianten
+- **Export**: BPMN 2.0 XML, Mermaid Flowcharts
 
 ### Datenschutz & Compliance
 
@@ -376,6 +463,33 @@ output_path = engine.generate_document(
 )
 ```
 
+### Innovation CLI
+
+Das Command-Line Interface bietet Zugriff auf alle Innovation Features:
+
+```bash
+# Hilfe anzeigen
+python cli/innovation_cli.py --help
+
+# Knowledge Base durchsuchen
+python cli/innovation_cli.py kb search "Benutzer anlegen"
+
+# Dokument zur Knowledge Base hinzufügen
+python cli/innovation_cli.py kb add -f manual.md -t "Benutzerhandbuch" --type manual
+
+# Tests aus Session generieren
+python cli/innovation_cli.py test generate -s session.json -f playwright -o test_login.py
+
+# Tutorial aus Session erstellen
+python cli/innovation_cli.py tutorial generate -s session.json -o tutorial.html --with-quiz
+
+# Process Mining auf Sessions ausführen
+python cli/innovation_cli.py pm analyze -d data/sessions -o process.bpmn -f bpmn
+
+# RAG-Abfrage stellen
+python cli/innovation_cli.py rag query "Wie erstelle ich einen Benutzer?"
+```
+
 ### Tests ausführen
 
 ```bash
@@ -530,6 +644,21 @@ Bei Fragen oder Problemen erstelle bitte ein Issue im Repository.
 
 Siehe [CHANGELOG.md](CHANGELOG.md) für vollständige Versionshistorie.
 
+### Version 1.1.0 - Innovation Features
+
+- 🚀 **Voice-First Documentation**: Whisper-Integration für Sprachdokumentation
+- 🚀 **Multi-Modal Knowledge Base**: RAG mit ChromaDB und GPT-4o
+- 🚀 **Predictive Documentation**: AI-gestützte Step-Vorhersage und Lücken-Analyse
+- 🚀 **Smart Context Capture**: Clipboard, Tab-Tracking, Intent-Analyse
+- 🚀 **Automated Test Generator**: Selenium, Playwright, Gherkin Export
+- 🚀 **Tutorial Generator**: Interaktive Tutorials mit SCORM-Support
+- 🚀 **Process Mining Engine**: Prozess-Discovery mit BPMN-Export
+- ✅ CLI für alle Innovation Features
+- ✅ Vollständige Test-Suite für alle neuen Module
+- ✅ GUI-Integration (Menüs, Dialoge, Hotkeys)
+- ✅ Konfiguration via `innovation_config.yaml`
+- ✅ Umfassende Beispiele und Demo-Skript
+
 ### Version 1.0.0
 
 - ✅ Vollständige Implementierung aller geplanten Features
@@ -541,5 +670,3 @@ Siehe [CHANGELOG.md](CHANGELOG.md) für vollständige Versionshistorie.
 - ✅ Startup-Validierung
 - ✅ GUI mit Menüleiste und Dialogen
 - ✅ Alle erweiterten Features implementiert
-
-

@@ -1,0 +1,186 @@
+# Innovation Features Configuration
+# AHG - Automatischer Handbuch-Generator
+# Version: 1.1
+
+# ===========================================
+# Voice-First Documentation Settings
+# ===========================================
+voice:
+  enabled: true
+  sample_rate: 16000  # Hz (optimal for Whisper)
+  channels: 1         # Mono
+  chunk_duration: 5.0 # Seconds per chunk for real-time transcription
+  
+  whisper:
+    model: "whisper-1"
+    language: "de"    # Primary language (de, en, auto)
+    prompt: "Technische Dokumentation. Software-Bedienung."
+  
+  commands:
+    primary_language: "de"
+    enable_english_fallback: true
+  
+  storage:
+    directory: "data/voice_recordings"
+    keep_audio_files: true
+    max_age_days: 30
+
+# ===========================================
+# Knowledge Base Settings
+# ===========================================
+knowledge_base:
+  enabled: true
+  storage_dir: "data/knowledge_base"
+  
+  embeddings:
+    enabled: true
+    model: "text-embedding-3-small"
+    storage_dir: "data/embeddings"
+    
+  rag:
+    enabled: true
+    model: "gpt-4o"
+    max_context_documents: 5
+    temperature: 0.3
+    
+  search:
+    default_mode: "hybrid"  # semantic, keyword, hybrid
+    min_score: 0.3
+    max_results: 50
+
+# ===========================================
+# Prediction Settings
+# ===========================================
+prediction:
+  enabled: true
+  
+  step_predictor:
+    min_confidence: 0.3
+    min_pattern_frequency: 2
+    model_dir: "data/prediction_models"
+    
+  gap_analyzer:
+    check_completeness: true
+    check_quality: true
+    check_flow: true
+    
+  auto_completer:
+    enabled: true
+    model: "gpt-4o-mini"
+    max_suggestions: 3
+    
+  workflow_learner:
+    min_pattern_frequency: 2
+    storage_dir: "data/workflow_patterns"
+
+# ===========================================
+# Context Capture Settings
+# ===========================================
+context:
+  enabled: true
+  
+  clipboard:
+    monitor: true
+    history_size: 20
+    poll_interval: 0.5  # Seconds
+    
+  tabs:
+    track_browser_tabs: true
+    supported_browsers:
+      - chrome
+      - firefox
+      - edge
+      - brave
+      
+  intent:
+    use_ai: true
+    ai_model: "gpt-4o-mini"
+
+# ===========================================
+# Test Generation Settings
+# ===========================================
+test_generation:
+  enabled: true
+  output_dir: "data/generated_tests"
+  
+  default_framework: "playwright"  # selenium, playwright, gherkin
+  
+  selenium:
+    language: "python"  # python, java
+    include_waits: true
+    
+  playwright:
+    language: "python"  # python, typescript
+    
+  gherkin:
+    language: "de"  # de, en
+    generate_step_definitions: true
+    
+  selectors:
+    prefer_type: "css"  # id, css, xpath, text
+    generate_fallbacks: true
+
+# ===========================================
+# Tutorial Generation Settings
+# ===========================================
+tutorial:
+  enabled: true
+  output_dir: "data/tutorials"
+  
+  include_quizzes: true
+  include_navigation: true
+  include_progress: true
+  
+  quiz:
+    use_ai: true
+    questions_per_section: 1
+    
+  scorm:
+    version: "2004 4th Edition"
+    organization_id: "AHG"
+    
+  learning_path:
+    adaptive: true
+    default_level: "intermediate"
+
+# ===========================================
+# Process Mining Settings
+# ===========================================
+process_mining:
+  enabled: true
+  output_dir: "data/process_models"
+  
+  discovery:
+    min_support: 0.1
+    
+  patterns:
+    min_support: 0.2
+    min_confidence: 0.5
+    max_pattern_length: 5
+    
+  variants:
+    anomaly_threshold: 5.0  # Percentage
+    
+  export:
+    bpmn: true
+    mermaid: true
+    dot: true
+    json: true
+
+# ===========================================
+# General Settings
+# ===========================================
+general:
+  # OpenAI API (required for AI features)
+  # Set via environment variable: OPENAI_API_KEY
+  
+  # Language
+  language: "de"
+  
+  # Logging
+  log_level: "INFO"
+  
+  # Data retention
+  auto_cleanup: true
+  retention_days: 90
+

@@ -119,6 +119,17 @@ class MainWindow:
         automation_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="Automatisierung", menu=automation_menu)
         automation_menu.add_command(label="App erkunden...", command=self._start_automated_exploration)
+        
+        # Innovation-Menü (Neue Features)
+        innovation_menu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="🚀 Innovation", menu=innovation_menu)
+        innovation_menu.add_command(label="🎤 Sprachsteuerung...", command=self._show_voice_control)
+        innovation_menu.add_command(label="🔍 Wissenssuche...", command=self._show_knowledge_search)
+        innovation_menu.add_separator()
+        innovation_menu.add_command(label="🧪 Test-Export...", command=self._show_test_export)
+        innovation_menu.add_command(label="📚 Tutorial-Export...", command=self._show_tutorial_export)
+        innovation_menu.add_separator()
+        innovation_menu.add_command(label="🔎 Process Mining...", command=self._show_process_mining)
     
     def _show_shortcuts(self):
         """Zeigt Dialog mit Tastenkürzeln"""
@@ -1335,4 +1346,184 @@ Für weitere Informationen siehe README.md
             text=f"Aktuelles Profil: {self.current_profile}, Vorlage: {template_name}",
             foreground="gray"
         )
+    
+    # ============================================
+    # Innovation Features (Neue Module)
+    # ============================================
+    
+    def _show_voice_control(self):
+        """Zeigt Sprachsteuerungs-Panel"""
+        try:
+            from src.gui.voice_panel import VoiceControlPanel
+            
+            # Create voice control window
+            voice_window = tk.Toplevel(self.root)
+            voice_window.title("🎤 Sprachsteuerung")
+            voice_window.geometry("400x350")
+            voice_window.transient(self.root)
+            
+            def on_transcription(text):
+                # Add transcription as comment to current step
+                if self.session_manager and text:
+                    logger.info(f"Voice transcription: {text}")
+                    # Could add to step comments or annotations
+            
+            panel = VoiceControlPanel(voice_window, on_transcription=on_transcription)
+            panel.pack(fill=tk.BOTH, expand=True)
+            
+        except ImportError as e:
+            messagebox.showwarning(
+                "Nicht verfügbar",
+                f"Sprachsteuerung nicht verfügbar.\nFehlende Abhängigkeit: {e}\n\n"
+                "Installieren Sie: pip install sounddevice openai"
+            )
+        except Exception as e:
+            logger.error(f"Voice control error: {e}")
+            messagebox.showerror("Fehler", f"Sprachsteuerung konnte nicht geöffnet werden:\n{e}")
+    
+    def _show_knowledge_search(self):
+        """Zeigt Wissenssuche-Dialog"""
+        try:
+            from src.gui.knowledge_search_dialog import KnowledgeSearchDialog
+            from src.knowledge import KnowledgeBase
+            
+            # Initialize or get knowledge base
+            kb = KnowledgeBase(storage_dir="data/knowledge_base")
+            
+            # Try to initialize RAG if API key available
+            rag = None
+            if os.getenv("OPENAI_API_KEY"):
+                try:
+                    from src.knowledge import EmbeddingEngine, SemanticSearch, RAGEngine
+                    embedding = EmbeddingEngine(storage_dir="data/embeddings")
+                    search = SemanticSearch(kb, embedding)
+                    rag = RAGEngine(search, language="de")
+                except Exception as e:
+                    logger.warning(f"RAG initialization failed: {e}")
+            
+            dialog = KnowledgeSearchDialog(self.root, knowledge_base=kb, rag_engine=rag)
+            
+        except ImportError as e:
+            messagebox.showwarning(
+                "Nicht verfügbar",
+                f"Wissenssuche nicht verfügbar.\nFehlende Abhängigkeit: {e}\n\n"
+                "Installieren Sie: pip install chromadb openai"
+            )
+        except Exception as e:
+            logger.error(f"Knowledge search error: {e}")
+            messagebox.showerror("Fehler", f"Wissenssuche konnte nicht geöffnet werden:\n{e}")
+    
+    def _show_test_export(self):
+        """Zeigt Test-Export Dialog"""
+        if not self.session_manager:
+            messagebox.showwarning("Keine Session", "Bitte starten Sie zuerst eine Session.")
+            return
+        
+        steps = self.session_manager.get_steps()
+        if not steps:
+            messagebox.showwarning("Keine Schritte", "Es sind keine Schritte vorhanden.")
+            return
+        
+        try:
+            from src.gui.test_export_dialog import TestExportDialog
+            
+            session_data = {
+                "session_id": getattr(self.session_manager, 'session_id', 'unknown'),
+                "name": getattr(self.session_manager, 'session_name', 'Dokumentation'),
+                "steps": steps
+            }
+            
+            dialog = TestExportDialog(self.root, session_data)
+            
+        except ImportError as e:
+            messagebox.showwarning(
+                "Nicht verfügbar",
+                f"Test-Export nicht verfügbar.\nFehlende Abhängigkeit: {e}"
+            )
+        except Exception as e:
+            logger.error(f"Test export error: {e}")
+            messagebox.showerror("Fehler", f"Test-Export konnte nicht geöffnet werden:\n{e}")
+    
+    def _show_tutorial_export(self):
+        """Zeigt Tutorial-Export Dialog"""
+        if not self.session_manager:
+            messagebox.showwarning("Keine Session", "Bitte starten Sie zuerst eine Session.")
+            return
+        
+        steps = self.session_manager.get_steps()
+        if not steps:
+            messagebox.showwarning("Keine Schritte", "Es sind keine Schritte vorhanden.")
+            return
+        
+        try:
+            from src.gui.tutorial_export_dialog import TutorialExportDialog
+            
+            session_data = {
+                "session_id": getattr(self.session_manager, 'session_id', 'unknown'),
+                "name": getattr(self.session_manager, 'session_name', 'Tutorial'),
+                "description": "Interaktives Tutorial aus Dokumentation",
+                "steps": steps
+            }
+            
+            dialog = TutorialExportDialog(self.root, session_data)
+            
+        except ImportError as e:
+            messagebox.showwarning(
+                "Nicht verfügbar",
+                f"Tutorial-Export nicht verfügbar.\nFehlende Abhängigkeit: {e}"
+            )
+        except Exception as e:
+            logger.error(f"Tutorial export error: {e}")
+            messagebox.showerror("Fehler", f"Tutorial-Export konnte nicht geöffnet werden:\n{e}")
+    
+    def _show_process_mining(self):
+        """Zeigt Process Mining Dialog"""
+        try:
+            from src.gui.process_mining_dialog import ProcessMiningDialog
+            
+            # Collect session data (current and from knowledge base if available)
+            sessions = []
+            
+            # Add current session if available
+            if self.session_manager:
+                steps = self.session_manager.get_steps()
+                if steps:
+                    sessions.append({
+                        "session_id": getattr(self.session_manager, 'session_id', 'current'),
+                        "name": getattr(self.session_manager, 'session_name', 'Aktuelle Session'),
+                        "steps": steps
+                    })
+            
+            # Try to load sessions from data directory
+            data_dir = Path("data/sessions")
+            if data_dir.exists():
+                import json
+                for session_file in data_dir.glob("*.json"):
+                    try:
+                        with open(session_file, 'r', encoding='utf-8') as f:
+                            session_data = json.load(f)
+                            if session_data.get("steps"):
+                                sessions.append(session_data)
+                    except Exception as e:
+                        logger.warning(f"Could not load session {session_file}: {e}")
+            
+            if not sessions:
+                messagebox.showwarning(
+                    "Keine Daten",
+                    "Keine Sessions für Process Mining gefunden.\n\n"
+                    "Starten Sie eine Session oder laden Sie Session-Daten in data/sessions/"
+                )
+                return
+            
+            dialog = ProcessMiningDialog(self.root, sessions)
+            
+        except ImportError as e:
+            messagebox.showwarning(
+                "Nicht verfügbar",
+                f"Process Mining nicht verfügbar.\nFehlende Abhängigkeit: {e}\n\n"
+                "Installieren Sie: pip install pm4py networkx"
+            )
+        except Exception as e:
+            logger.error(f"Process mining error: {e}")
+            messagebox.showerror("Fehler", f"Process Mining konnte nicht geöffnet werden:\n{e}")
 
