@@ -31,6 +31,9 @@ from src.gui.gitops_dialog import GitOpsDialog
 from src.gui.accessibility_dialog import AccessibilityDialog
 from src.gui.roi_dashboard import ROIDashboard
 from src.gui.video_synthesis_dialog import VideoSynthesisDialog
+from src.gui.translation_dialog import TranslationDialog
+from src.gui.collaboration_dialog import CollaborationDialog
+from src.gui.agent_dialog import AgentDialog
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -139,6 +142,10 @@ class MainWindow:
         innovation_menu.add_command(label="♿ Accessibility Check...", command=self._show_accessibility_dialog, accelerator="Ctrl+Alt+A")
         innovation_menu.add_command(label="📊 ROI Dashboard...", command=self._show_roi_dashboard, accelerator="Ctrl+Alt+R")
         innovation_menu.add_command(label="🎬 Video Tutorial Generator...", command=self._show_video_synthesis)
+        innovation_menu.add_separator()
+        innovation_menu.add_command(label="🌐 Translation Hub...", command=self._show_translation_dialog, accelerator="Ctrl+Alt+T")
+        innovation_menu.add_command(label="👥 Collaboration Hub...", command=self._show_collaboration_dialog, accelerator="Ctrl+Alt+C")
+        innovation_menu.add_command(label="🤖 Autonomous Agent...", command=self._show_agent_dialog, accelerator="Ctrl+Alt+B")
     
     def _show_shortcuts(self):
         """Zeigt Dialog mit Tastenkürzeln"""
@@ -242,6 +249,15 @@ Für weitere Informationen siehe README.md
         
         # Ctrl+Alt+R: ROI Dashboard
         self.root.bind('<Control-Alt-r>', lambda e: self._show_roi_dashboard())
+        
+        # Ctrl+Alt+T: Translation Hub
+        self.root.bind('<Control-Alt-t>', lambda e: self._show_translation_dialog())
+        
+        # Ctrl+Alt+C: Collaboration Hub
+        self.root.bind('<Control-Alt-c>', lambda e: self._show_collaboration_dialog())
+        
+        # Ctrl+Alt+B: Autonomous Agent
+        self.root.bind('<Control-Alt-b>', lambda e: self._show_agent_dialog())
         
         # Ctrl+T: Qualitätsprüfung öffnen
         self.root.bind('<Control-t>', lambda e: self._show_quality_check())
@@ -1590,5 +1606,29 @@ Für weitere Informationen siehe README.md
             dialog = VideoSynthesisDialog(self.root, session_data, screenshot_paths)
         except Exception as e:
             logger.error(f"Fehler beim Öffnen des Video-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler: {e}")
+    
+    def _show_translation_dialog(self):
+        """Zeigt Translation Hub Dialog"""
+        try:
+            dialog = TranslationDialog(self.root)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des Translation-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler: {e}")
+    
+    def _show_collaboration_dialog(self):
+        """Zeigt Collaboration Hub Dialog"""
+        try:
+            dialog = CollaborationDialog(self.root)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des Collaboration-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler: {e}")
+    
+    def _show_agent_dialog(self):
+        """Zeigt Autonomous Agent Dialog"""
+        try:
+            dialog = AgentDialog(self.root)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des Agent-Dialogs: {e}")
             messagebox.showerror("Fehler", f"Fehler: {e}")
 

@@ -14,8 +14,9 @@ Vollautomatische Erstellung bebilderter technischer Handbücher aus realen Nutzu
 - **Erweiterte Export-Optionen**: Multi-Sprach-Export, Cloud-Upload, Quick-Reference, Video-Export, Platform-Export
 - **Automatisierungs-Features**: Automatische App-Erkundung und Dokumentation
 
-### 🚀 Innovation Features (v1.1)
+### 🚀 Innovation Features
 
+#### v1.1 Features
 - **Voice-First Documentation**: Hands-free Dokumentation per Sprachsteuerung mit OpenAI Whisper
 - **Multi-Modal Knowledge Base**: Semantische Suche mit RAG (Retrieval-Augmented Generation)
 - **Predictive Documentation**: KI-gestützte Vorhersage nächster Dokumentationsschritte
@@ -23,6 +24,15 @@ Vollautomatische Erstellung bebilderter technischer Handbücher aus realen Nutzu
 - **Automated Test Generation**: Export dokumentierter Workflows als Selenium/Playwright/Gherkin Tests
 - **Interactive Tutorial Generator**: Konvertierung von Dokumentation in SCORM-kompatible interaktive Tutorials
 - **Process Mining Engine**: Analyse und BPMN-Export von Benutzer-Sessions
+
+#### v2.0 Features (NEU!)
+- **GitOps Documentation Pipeline**: Documentation-as-Code mit Git-Integration, AI Commits, PR Automation
+- **Accessibility Compliance Engine**: WCAG 2.2 Prüfung, Auto-Remediation, Compliance-Reports
+- **Documentation ROI Dashboard**: Metriken, ROI-Berechnung, Predictive Analytics
+- **Intelligent Translation Hub**: Kontextbewusste Übersetzung, Glossar, Translation Memory
+- **Video Tutorial Synthesizer**: Automatische Video-Generierung mit AI-Narration und Untertiteln
+- **Real-Time Collaboration Hub**: Echtzeit-Synchronisation mit CRDT, Presence-Tracking, Comments
+- **Autonomous Documentation Agent**: Vollautonome KI für selbstständige Dokumentation
 
 ## Schnellstart
 
@@ -102,7 +112,21 @@ Documentation-Tool-Generic/
 │   ├── audit/             # Audit-Trail
 │   ├── config/            # Konfiguration
 │   │
-│   │  --- Innovation Features (v1.1) ---
+│   │  --- Innovation Features (v1.1 & v2.0) ---
+│   │   ├── voice/           # Voice-First Documentation
+│   │   ├── knowledge/       # Knowledge Base / RAG
+│   │   ├── prediction/      # Predictive Assistant
+│   │   ├── context/         # Smart Context Capture
+│   │   ├── testgen/         # Test Case Generator
+│   │   ├── tutorial/        # Tutorial Generator
+│   │   ├── processmining/   # Process Mining Engine
+│   │   ├── gitops/          # GitOps Pipeline (v2.0)
+│   │   ├── accessibility/   # Accessibility Engine (v2.0)
+│   │   ├── analytics/       # ROI Dashboard (v2.0)
+│   │   ├── translation/     # Translation Hub (v2.0)
+│   │   ├── video/           # Video Synthesizer (v2.0)
+│   │   ├── collaboration/   # Collaboration Hub (v2.0)
+│   │   └── agent/           # Autonomous Agent (v2.0)
 │   ├── voice/             # Voice-First Documentation
 │   ├── knowledge/         # Knowledge Base + RAG
 │   ├── prediction/        # Predictive Assistant

@@ -340,6 +340,27 @@ Beispiele:
   python cli/innovation_cli.py gitops init -p ./docs --remote-url https://github.com/user/repo.git
   python cli/innovation_cli.py gitops sync -p ./docs --push
   python cli/innovation_cli.py gitops status -p ./docs
+  
+  # Translation
+  python cli/innovation_cli.py translation translate --text "Hallo Welt" -s de -t en
+  python cli/innovation_cli.py translation glossary add -t "Benutzer" -l en -v "User"
+  
+  # Collaboration
+  python cli/innovation_cli.py collaboration start-server --port 8765
+  
+  # Agent
+  python cli/innovation_cli.py agent execute --goal "Dokumentiere Login-Prozess"
+  
+  # Video
+  python cli/innovation_cli.py video generate -s session.json -o tutorial.mp4
+  
+  # ROI
+  python cli/innovation_cli.py roi calculate --days 30
+  python cli/innovation_cli.py roi export -o dashboard.json
+  
+  # Accessibility
+  python cli/innovation_cli.py a11y audit -f doc.html
+  python cli/innovation_cli.py a11y fix -f doc.html --auto
 """
     )
     
@@ -445,6 +466,103 @@ Beispiele:
     gitops_status.add_argument("--repo-path", "-p", required=True, help="Repository-Pfad")
     gitops_status.add_argument("--sync", "-s", action="store_true", help="Sync-Status anzeigen")
     gitops_status.set_defaults(func=cmd_gitops_status)
+    
+    # Translation commands
+    translation_parser = subparsers.add_parser("translation", help="Intelligent Translation Hub")
+    trans_sub = translation_parser.add_subparsers(dest="translation_command")
+    
+    # translation translate
+    trans_translate = trans_sub.add_parser("translate", help="Text übersetzen")
+    trans_translate.add_argument("--file", "-f", help="Datei zum Übersetzen")
+    trans_translate.add_argument("--source", "-s", default="de", help="Quellsprache")
+    trans_translate.add_argument("--target", "-t", default="en", help="Zielsprache")
+    trans_translate.add_argument("--text", help="Text direkt (statt Datei)")
+    trans_translate.add_argument("--project", "-p", default="default", help="Projektname")
+    trans_translate.set_defaults(func=cmd_translation_translate)
+    
+    # translation glossary
+    trans_glossary = trans_sub.add_parser("glossary", help="Glossar-Verwaltung")
+    trans_glossary_sub = trans_glossary.add_subparsers(dest="glossary_command")
+    
+    trans_glossary_add = trans_glossary_sub.add_parser("add", help="Begriff hinzufügen")
+    trans_glossary_add.add_argument("--term", "-t", required=True, help="Quellbegriff")
+    trans_glossary_add.add_argument("--language", "-l", required=True, help="Zielsprache")
+    trans_glossary_add.add_argument("--value", "-v", required=True, help="Übersetzung")
+    trans_glossary_add.add_argument("--project", "-p", default="default", help="Projektname")
+    trans_glossary_add.set_defaults(func=cmd_translation_glossary_add)
+    
+    # translation memory
+    trans_memory = trans_sub.add_parser("memory", help="Translation Memory")
+    trans_memory.add_argument("search", nargs="?", help="Suchbegriff")
+    trans_memory.add_argument("--source", "-s", default="de", help="Quellsprache")
+    trans_memory.add_argument("--target", "-t", default="en", help="Zielsprache")
+    trans_memory.set_defaults(func=cmd_translation_memory)
+    
+    # Collaboration commands
+    collab_parser = subparsers.add_parser("collaboration", help="Real-Time Collaboration")
+    collab_sub = collab_parser.add_subparsers(dest="collaboration_command")
+    
+    collab_start = collab_sub.add_parser("start-server", help="Server starten")
+    collab_start.add_argument("--port", "-p", type=int, default=8765, help="Port")
+    collab_start.set_defaults(func=cmd_collaboration_start)
+    
+    # Agent commands
+    agent_parser = subparsers.add_parser("agent", help="Autonomous Documentation Agent")
+    agent_sub = agent_parser.add_subparsers(dest="agent_command")
+    
+    agent_execute = agent_sub.add_parser("execute", help="Task ausführen")
+    agent_execute.add_argument("--goal", "-g", required=True, help="Task-Goal")
+    agent_execute.add_argument("--max-steps", "-m", type=int, default=20, help="Maximale Steps")
+    agent_execute.set_defaults(func=cmd_agent_execute)
+    
+    agent_status = agent_sub.add_parser("status", help="Agent-Status")
+    agent_status.set_defaults(func=cmd_agent_status)
+    
+    # Video commands
+    video_parser = subparsers.add_parser("video", help="Video Tutorial Synthesizer")
+    video_sub = video_parser.add_subparsers(dest="video_command")
+    
+    video_generate = video_sub.add_parser("generate", help="Video generieren")
+    video_generate.add_argument("--session", "-s", help="Session-Datei")
+    video_generate.add_argument("--output", "-o", required=True, help="Ausgabedatei")
+    video_generate.add_argument("--fps", type=int, default=30, help="Frame Rate")
+    video_generate.add_argument("--language", "-l", default="de", help="Sprache")
+    video_generate.set_defaults(func=cmd_video_generate)
+    
+    # ROI commands
+    roi_parser = subparsers.add_parser("roi", help="ROI Dashboard")
+    roi_sub = roi_parser.add_subparsers(dest="roi_command")
+    
+    roi_calculate = roi_sub.add_parser("calculate", help="ROI berechnen")
+    roi_calculate.add_argument("--days", "-d", type=int, help="Anzahl Tage")
+    roi_calculate.add_argument("--hourly-rate", type=float, default=50.0, help="Stundensatz")
+    roi_calculate.set_defaults(func=cmd_roi_calculate)
+    
+    roi_export = roi_sub.add_parser("export", help="ROI exportieren")
+    roi_export.add_argument("--format", "-f", default="json", choices=["json", "html"], help="Format")
+    roi_export.add_argument("--output", "-o", required=True, help="Ausgabedatei")
+    roi_export.add_argument("--days", "-d", type=int, help="Anzahl Tage")
+    roi_export.set_defaults(func=cmd_roi_export)
+    
+    # Accessibility commands
+    a11y_parser = subparsers.add_parser("a11y", help="Accessibility Compliance")
+    a11y_sub = a11y_parser.add_subparsers(dest="a11y_command")
+    
+    a11y_audit = a11y_sub.add_parser("audit", help="WCAG Audit durchführen")
+    a11y_audit.add_argument("--file", "-f", required=True, help="HTML-Datei")
+    a11y_audit.add_argument("--level", "-l", default="AA", choices=["A", "AA", "AAA"], help="WCAG Level")
+    a11y_audit.set_defaults(func=cmd_a11y_audit)
+    
+    a11y_fix = a11y_sub.add_parser("fix", help="Automatisch korrigieren")
+    a11y_fix.add_argument("--file", "-f", required=True, help="HTML-Datei")
+    a11y_fix.add_argument("--auto", action="store_true", help="Automatisch korrigieren")
+    a11y_fix.set_defaults(func=cmd_a11y_fix)
+    
+    a11y_report = a11y_sub.add_parser("report", help="Report generieren")
+    a11y_report.add_argument("--file", "-f", required=True, help="HTML-Datei")
+    a11y_report.add_argument("--format", choices=["json", "html"], default="html", help="Format")
+    a11y_report.add_argument("--output", "-o", help="Ausgabedatei")
+    a11y_report.set_defaults(func=cmd_a11y_report)
     
     args = parser.parse_args()
     
