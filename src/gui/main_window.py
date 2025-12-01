@@ -30,6 +30,7 @@ from src.gui.platform_export_dialog import PlatformExportDialog
 from src.gui.gitops_dialog import GitOpsDialog
 from src.gui.accessibility_dialog import AccessibilityDialog
 from src.gui.roi_dashboard import ROIDashboard
+from src.gui.video_synthesis_dialog import VideoSynthesisDialog
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -137,6 +138,7 @@ class MainWindow:
         innovation_menu.add_command(label="🔧 GitOps Pipeline...", command=self._show_gitops_dialog, accelerator="Ctrl+Alt+G")
         innovation_menu.add_command(label="♿ Accessibility Check...", command=self._show_accessibility_dialog, accelerator="Ctrl+Alt+A")
         innovation_menu.add_command(label="📊 ROI Dashboard...", command=self._show_roi_dashboard, accelerator="Ctrl+Alt+R")
+        innovation_menu.add_command(label="🎬 Video Tutorial Generator...", command=self._show_video_synthesis)
     
     def _show_shortcuts(self):
         """Zeigt Dialog mit Tastenkürzeln"""
@@ -1572,4 +1574,21 @@ Für weitere Informationen siehe README.md
         except Exception as e:
             logger.error(f"Fehler beim Öffnen des ROI-Dashboards: {e}")
             messagebox.showerror("Fehler", f"Fehler beim Öffnen des ROI-Dashboards:\n{e}")
+    
+    def _show_video_synthesis(self):
+        """Zeigt Video Synthesis Dialog"""
+        try:
+            session_data = {}
+            screenshot_paths = []
+            
+            if self.session_manager:
+                steps = self.session_manager.get_steps()
+                session_data = {"steps": steps}
+                # Get screenshot paths from steps
+                screenshot_paths = [Path(s.get('screenshot_path', '')) for s in steps if s.get('screenshot_path')]
+            
+            dialog = VideoSynthesisDialog(self.root, session_data, screenshot_paths)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des Video-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler: {e}")
 
