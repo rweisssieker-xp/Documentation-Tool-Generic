@@ -1,0 +1,2 @@
+"""Local Whisper Implementation"""
+

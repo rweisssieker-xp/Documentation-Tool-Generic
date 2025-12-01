@@ -312,6 +312,269 @@ def cmd_gitops_status(args):
         print(f"Pending Changes: {sync_status.get('pending_changes', 0)}")
 
 
+def cmd_translation_translate(args):
+    """Translate text or file."""
+    from src.translation import TranslationHub
+    
+    hub = TranslationHub(project_name=args.project)
+    
+    if args.file:
+        content = Path(args.file).read_text(encoding='utf-8')
+    elif args.text:
+        content = args.text
+    else:
+        print("Fehler: --file oder --text erforderlich")
+        return
+    
+    translated = hub.translate_document(content, args.source, args.target)
+    print(f"\nÜbersetzung ({args.source} -> {args.target}):")
+    print("=" * 60)
+    print(translated)
+    print("=" * 60)
+
+
+def cmd_translation_glossary_add(args):
+    """Add glossary term."""
+    from src.translation import TranslationHub
+    
+    hub = TranslationHub(project_name=args.project)
+    hub.add_glossary_term(args.term, args.language, args.value)
+    print(f"Begriff hinzugefügt: {args.term} -> {args.value} ({args.language})")
+
+
+def cmd_translation_memory(args):
+    """Search translation memory."""
+    from src.translation import TranslationMemory
+    
+    tm = TranslationMemory()
+    
+    if args.search:
+        matches = tm.find_fuzzy_match(args.search, args.source, args.target)
+        print(f"\n{len(matches)} Treffer für '{args.search}':\n")
+        for unit, similarity in matches[:10]:
+            print(f"  [{similarity:.0%}] {unit.source_text[:50]}...")
+            print(f"       -> {unit.target_text[:50]}...")
+            print()
+    else:
+        stats = tm.get_statistics()
+        print(f"\nTranslation Memory Statistiken:")
+        print(f"  Total Units: {stats['total_units']}")
+        print(f"  Total Usage: {stats['total_usage']}")
+        print(f"  Avg Quality: {stats['avg_quality']:.2f}")
+
+
+def cmd_collaboration_start(args):
+    """Start collaboration server."""
+    from src.collaboration import RealtimeServer
+    
+    server = RealtimeServer(port=args.port)
+    
+    if not server.app:
+        print("Fehler: FastAPI nicht verfügbar. Installieren Sie: pip install fastapi uvicorn")
+        return
+    
+    print(f"Server startet auf Port {args.port}...")
+    print(f"WebSocket Endpoint: ws://localhost:{args.port}/ws")
+    print("Drücken Sie Ctrl+C zum Beenden")
+    
+    import uvicorn
+    uvicorn.run(server.app, host="0.0.0.0", port=args.port)
+
+
+def cmd_agent_execute(args):
+    """Execute autonomous agent task."""
+    from src.agent import AutonomousAgent
+    
+    agent = AutonomousAgent()
+    
+    if not agent.client:
+        print("Fehler: OPENAI_API_KEY nicht gesetzt")
+        return
+    
+    print(f"Agent startet...")
+    print(f"Goal: {args.goal}")
+    print(f"Max Steps: {args.max_steps}")
+    print("-" * 60)
+    
+    steps = agent.execute_task(args.goal, max_steps=args.max_steps)
+    
+    print("-" * 60)
+    print(f"Agent abgeschlossen. {len(steps)} Steps ausgeführt.\n")
+    
+    for i, step in enumerate(steps, 1):
+        print(f"Step {i}: {step.get('action', 'N/A')}")
+        print(f"  Result: {step.get('result', 'N/A')}")
+        print(f"  Success: {step.get('success', False)}")
+        print()
+
+
+def cmd_agent_status(args):
+    """Show agent status."""
+    from src.agent import AutonomousAgent
+    
+    agent = AutonomousAgent()
+    
+    print("\nAgent Status:")
+    print(f"  Tools verfügbar: {agent.tool_executor.available}")
+    print(f"  AI verfügbar: {agent.client is not None}")
+    print(f"  Model: {agent.model}")
+
+
+def cmd_video_generate(args):
+    """Generate video tutorial."""
+    from src.video import VideoSynthesizer, VideoConfig
+    from pathlib import Path
+    import json
+    
+    config = VideoConfig(
+        frame_rate=args.fps,
+        language=args.language
+    )
+    synthesizer = VideoSynthesizer(config)
+    
+    session_data = {}
+    screenshot_paths = []
+    
+    if args.session:
+        session_file = Path(args.session)
+        if session_file.exists():
+            session_data = json.loads(session_file.read_text(encoding='utf-8'))
+            # Extract screenshot paths
+            steps = session_data.get('steps', [])
+            screenshot_paths = [Path(s.get('screenshot_path', '')) for s in steps if s.get('screenshot_path')]
+    
+    output_path = Path(args.output)
+    
+    print(f"Video-Generierung startet...")
+    print(f"  Output: {output_path}")
+    print(f"  FPS: {args.fps}")
+    print(f"  Sprache: {args.language}")
+    
+    success = synthesizer.generate_video(session_data, screenshot_paths, output_path)
+    
+    if success:
+        print(f"\nVideo erfolgreich generiert: {output_path}")
+    else:
+        print("\nVideo-Generierung fehlgeschlagen")
+
+
+def cmd_roi_calculate(args):
+    """Calculate ROI."""
+    from src.analytics import MetricsCollector, ROICalculator
+    
+    collector = MetricsCollector()
+    calculator = ROICalculator(collector, hourly_rate=args.hourly_rate)
+    
+    roi = calculator.calculate_roi(days=args.days)
+    
+    print("\nROI Berechnung:")
+    print("=" * 60)
+    print(f"Zeit gespart:     {roi.time_saved_hours:.1f} Stunden")
+    print(f"Kosten gespart:   {roi.cost_saved:.2f} EUR")
+    print(f"Effizienz-Gewinn: {roi.efficiency_gain:.1f}%")
+    print(f"ROI:              {roi.roi_percentage:.1f}%")
+    if roi.payback_period_days > 0:
+        print(f"Amortisationszeit: {roi.payback_period_days:.1f} Tage")
+    print("=" * 60)
+
+
+def cmd_roi_export(args):
+    """Export ROI dashboard."""
+    from src.analytics import DashboardAPI
+    from pathlib import Path
+    
+    api = DashboardAPI()
+    output_path = Path(args.output)
+    
+    if args.format == "json":
+        success = api.export_dashboard_json(output_path, days=args.days)
+    else:
+        print("HTML Export noch nicht implementiert")
+        return
+    
+    if success:
+        print(f"ROI Dashboard exportiert: {output_path}")
+    else:
+        print("Export fehlgeschlagen")
+
+
+def cmd_a11y_audit(args):
+    """Audit accessibility."""
+    from src.accessibility import WCAGAuditor, WCAGLevel
+    from pathlib import Path
+    
+    level_map = {"A": WCAGLevel.A, "AA": WCAGLevel.AA, "AAA": WCAGLevel.AAA}
+    auditor = WCAGAuditor(level=level_map.get(args.level, WCAGLevel.AA))
+    
+    file_path = Path(args.file)
+    result = auditor.audit_file(file_path)
+    
+    print(f"\nWCAG {args.level} Audit für {args.file}:")
+    print("=" * 60)
+    print(f"Score: {result.score:.1f}%")
+    print(f"Violations: {len(result.violations)}")
+    print(f"Passes: {result.passes}")
+    print("\nViolations:")
+    for v in result.violations[:10]:
+        print(f"  [{v.impact.upper()}] {v.rule_id}: {v.description}")
+
+
+def cmd_a11y_fix(args):
+    """Fix accessibility issues."""
+    from src.accessibility import WCAGAuditor, WCAGLevel, AutoRemediation
+    from pathlib import Path
+    
+    file_path = Path(args.file)
+    
+    auditor = WCAGAuditor(level=WCAGLevel.AA)
+    result = auditor.audit_file(file_path)
+    
+    if not result.violations:
+        print("Keine Violations gefunden")
+        return
+    
+    remediation = AutoRemediation()
+    html_content = file_path.read_text(encoding='utf-8')
+    
+    fixed_html = remediation.remediate_html(html_content, result.violations)
+    
+    backup_path = file_path.with_suffix('.html.backup')
+    file_path.rename(backup_path)
+    file_path.write_text(fixed_html, encoding='utf-8')
+    
+    print(f"Datei korrigiert: {file_path}")
+    print(f"Backup: {backup_path}")
+
+
+def cmd_a11y_report(args):
+    """Generate accessibility report."""
+    from src.accessibility import WCAGAuditor, WCAGLevel, StructureValidator, ComplianceReportGenerator
+    from pathlib import Path
+    
+    file_path = Path(args.file)
+    
+    auditor = WCAGAuditor(level=WCAGLevel.AA)
+    audit_result = auditor.audit_file(file_path)
+    
+    validator = StructureValidator()
+    html_content = file_path.read_text(encoding='utf-8')
+    structure_issues = validator.validate(html_content)
+    
+    generator = ComplianceReportGenerator()
+    report = generator.generate_report(audit_result, structure_issues, str(file_path))
+    
+    output_path = Path(args.output) if args.output else file_path.with_suffix(f'.{args.format}')
+    
+    if args.format == "json":
+        generator.export_json(report, output_path)
+    else:
+        generator.export_html(report, output_path)
+    
+    print(f"Report generiert: {output_path}")
+    print(f"Compliant: {report.compliant}")
+    print(f"Score: {report.score:.1f}%")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="AHG Innovation Features CLI",

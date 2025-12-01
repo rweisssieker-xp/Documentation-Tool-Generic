@@ -95,3 +95,33 @@ imageio-ffmpeg>=0.4.9
 
 # UI Automation (Autonomous Agent)
 pyautogui>=0.9.54
+
+# ============================================
+# NEW: Innovation Features v3.0 Dependencies
+# ============================================
+
+# API-First Gateway
+fastapi>=0.104.0
+uvicorn>=0.24.0
+websockets>=12.0
+pydantic>=2.0.0
+strawberry-graphql>=0.200.0
+
+# Authentication
+PyJWT>=2.8.0
+python-multipart>=0.0.6
+
+# Edge AI
+llama-cpp-python>=0.2.0
+transformers>=4.35.0
+openai-whisper>=20231117
+sentence-transformers>=2.2.2
+torch>=2.1.0
+
+# Blockchain
+web3>=6.11.0
+eth-account>=0.9.0
+
+# AR/VR (optional, requires hardware)
+# opencv-python>=4.8.0  # Already included
+# numpy>=1.24.0  # Already included

@@ -46,4 +46,8 @@ class CommentSystem:
         if position:
             return [c for c in self.comments.values() if c.position == position]
         return list(self.comments.values())
+    
+    def get_review(self, comment_id: str) -> Optional[Comment]:
+        """Get comment by ID."""
+        return self.comments.get(comment_id)
 
