@@ -179,3 +179,4 @@ class ARDialog:
             logger.error(f"Error hiding overlay: {e}")
             messagebox.showerror("Error", f"Failed to hide overlay: {e}")
 
+

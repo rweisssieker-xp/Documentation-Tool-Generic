@@ -195,3 +195,4 @@ All features accessible via menu:
 **Quick Reference Version:** 3.0.0  
 **For detailed documentation, see individual feature guides**
 
+

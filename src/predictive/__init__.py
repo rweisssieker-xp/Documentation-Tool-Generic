@@ -7,6 +7,8 @@ from .code_analysis.ast_parser import ASTParser
 from .code_analysis.diff_detector import DiffDetector
 from .ui_analysis.screenshot_diff import ScreenshotDiff
 from .ml_models.drift_detector import DriftDetector
+from .ml_models.priority_scorer import PriorityScorer
+from .usage_analytics.pattern_analyzer import UsagePatternAnalyzer
 
 __all__ = [
     'PredictiveMaintenanceEngine',
@@ -14,5 +16,7 @@ __all__ = [
     'DiffDetector',
     'ScreenshotDiff',
     'DriftDetector',
+    'PriorityScorer',
+    'UsagePatternAnalyzer',
 ]
 

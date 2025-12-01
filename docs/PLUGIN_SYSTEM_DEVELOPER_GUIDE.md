@@ -415,3 +415,4 @@ class JiraIntegrationPlugin(BasePlugin):
 **Last Updated:** 2025-12-01  
 **Maintained By:** Technical Writing Team
 
+

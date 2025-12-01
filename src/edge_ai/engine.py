@@ -7,6 +7,7 @@ from enum import Enum
 
 from .llm.llama import LlamaLLM
 from .llm.mistral import MistralLLM
+from .llm.phi import PhiLLM
 from .whisper.local_whisper import LocalWhisper
 from .embeddings.local_embeddings import LocalEmbeddings
 from .models.manager import ModelManager
@@ -58,6 +59,8 @@ class EdgeAIEngine:
                 self.llm = LlamaLLM(model_path=self.model_path, use_gpu=self.use_gpu)
             elif self.model_type == ModelType.MISTRAL:
                 self.llm = MistralLLM(model_path=self.model_path, use_gpu=self.use_gpu)
+            elif self.model_type == ModelType.PHI:
+                self.llm = PhiLLM(model_path=self.model_path, use_gpu=self.use_gpu)
             
             # Initialize Whisper
             self.whisper = LocalWhisper(use_gpu=self.use_gpu)

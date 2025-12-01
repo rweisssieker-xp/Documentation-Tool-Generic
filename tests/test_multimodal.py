@@ -65,3 +65,4 @@ class TestAudioRecorder:
         assert recorder.sample_rate == 44100
         assert recorder.recording is False
 
+

@@ -204,3 +204,4 @@ class PluginDialog:
         self.marketplace_text.insert(tk.END, f"\nSearching for: {query}...\n")
         self.marketplace_text.insert(tk.END, "Marketplace search coming soon!\n")
 
+

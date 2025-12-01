@@ -232,3 +232,4 @@ class BlockchainDialog:
             logger.error(f"Error verifying document: {e}")
             messagebox.showerror("Error", f"Failed to verify document: {e}")
 
+

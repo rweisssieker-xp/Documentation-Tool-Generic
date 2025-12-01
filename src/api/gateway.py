@@ -15,6 +15,12 @@ from .rest.knowledge import KnowledgeAPI
 from .rest.voice import VoiceAPI
 from .rest.collaboration import CollaborationAPI
 from .rest.analytics import AnalyticsAPI
+from .rest.edge_ai import EdgeAIAPI
+from .rest.ar import ARAPI
+from .rest.blockchain import BlockchainAPI
+from .rest.predictive import PredictiveAPI
+from .rest.multimodal import MultiModalAPI
+from .rest.plugins import PluginAPI
 from .graphql.schema import GraphQLSchema
 from .websocket.realtime import WebSocketHandler
 from .auth.jwt import JWTAuth
@@ -98,6 +104,12 @@ class APIGateway:
         voice_api = VoiceAPI()
         collaboration_api = CollaborationAPI()
         analytics_api = AnalyticsAPI()
+        edge_ai_api = EdgeAIAPI()
+        ar_api = ARAPI()
+        blockchain_api = BlockchainAPI()
+        predictive_api = PredictiveAPI()
+        multimodal_api = MultiModalAPI()
+        plugins_api = PluginAPI()
         
         self.app.include_router(session_api.router, prefix="/api/v1/sessions", tags=["Sessions"])
         self.app.include_router(document_api.router, prefix="/api/v1/documents", tags=["Documents"])
@@ -105,6 +117,12 @@ class APIGateway:
         self.app.include_router(voice_api.router, prefix="/api/v1/voice", tags=["Voice"])
         self.app.include_router(collaboration_api.router, prefix="/api/v1/collaboration", tags=["Collaboration"])
         self.app.include_router(analytics_api.router, prefix="/api/v1/analytics", tags=["Analytics"])
+        self.app.include_router(edge_ai_api.router, prefix="/api/v1/edge-ai", tags=["Edge AI"])
+        self.app.include_router(ar_api.router, prefix="/api/v1/ar", tags=["AR"])
+        self.app.include_router(blockchain_api.router, prefix="/api/v1/blockchain", tags=["Blockchain"])
+        self.app.include_router(predictive_api.router, prefix="/api/v1/predictive", tags=["Predictive"])
+        self.app.include_router(multimodal_api.router, prefix="/api/v1/multimodal", tags=["Multi-Modal"])
+        self.app.include_router(plugins_api.router, prefix="/api/v1/plugins", tags=["Plugins"])
         
         # GraphQL Route
         graphql_schema = GraphQLSchema()

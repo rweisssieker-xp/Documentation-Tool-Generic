@@ -145,3 +145,4 @@ class PredictiveDialog:
         """Export analysis report"""
         messagebox.showinfo("Info", "Export functionality coming soon!")
 
+

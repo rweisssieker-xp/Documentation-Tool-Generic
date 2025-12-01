@@ -67,3 +67,4 @@ class TestDocumentAPI:
         assert api.sessions_dir.exists()
         assert api.documents_dir.exists()
 
+

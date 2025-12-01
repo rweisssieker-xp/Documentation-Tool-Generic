@@ -131,3 +131,4 @@ class MultiModalDialog:
             logger.error(f"Error stopping recording: {e}")
             messagebox.showerror("Error", f"Failed to stop recording: {e}")
 
+

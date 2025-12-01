@@ -170,3 +170,4 @@ class APIDialog:
         self.status_text.insert(tk.END, "\nServer stopped\n")
         messagebox.showinfo("Info", "Server stop requested (restart application to fully stop)")
 
+
