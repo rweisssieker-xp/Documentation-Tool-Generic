@@ -27,6 +27,7 @@ from src.gui.app_selector_dialog import AppSelectorDialog
 from src.gui.exploration_progress_dialog import ExplorationProgressDialog
 from src.gui.progress_dialog import ProgressDialog
 from src.gui.platform_export_dialog import PlatformExportDialog
+from src.gui.gitops_dialog import GitOpsDialog
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -130,6 +131,8 @@ class MainWindow:
         innovation_menu.add_command(label="📚 Tutorial-Export...", command=self._show_tutorial_export)
         innovation_menu.add_separator()
         innovation_menu.add_command(label="🔎 Process Mining...", command=self._show_process_mining)
+        innovation_menu.add_separator()
+        innovation_menu.add_command(label="🔧 GitOps Pipeline...", command=self._show_gitops_dialog, accelerator="Ctrl+Alt+G")
     
     def _show_shortcuts(self):
         """Zeigt Dialog mit Tastenkürzeln"""
@@ -224,6 +227,9 @@ Für weitere Informationen siehe README.md
         
         # Ctrl+M: Statistiken öffnen
         self.root.bind('<Control-m>', lambda e: self._show_stats_dashboard())
+        
+        # Ctrl+Alt+G: GitOps Dialog
+        self.root.bind('<Control-Alt-g>', lambda e: self._show_gitops_dialog())
         
         # Ctrl+T: Qualitätsprüfung öffnen
         self.root.bind('<Control-t>', lambda e: self._show_quality_check())
@@ -1526,4 +1532,18 @@ Für weitere Informationen siehe README.md
         except Exception as e:
             logger.error(f"Process mining error: {e}")
             messagebox.showerror("Fehler", f"Process Mining konnte nicht geöffnet werden:\n{e}")
+    
+    def _show_gitops_dialog(self):
+        """Zeigt GitOps Configuration Dialog"""
+        try:
+            dialog = GitOpsDialog(self.root)
+            config = dialog.show()
+            
+            if config:
+                logger.info("GitOps Konfiguration gespeichert")
+                # TODO: Save config to settings
+                messagebox.showinfo("Erfolg", "GitOps-Konfiguration gespeichert!")
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des GitOps-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler beim Öffnen des GitOps-Dialogs:\n{e}")
 

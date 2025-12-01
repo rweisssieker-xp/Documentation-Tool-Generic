@@ -225,6 +225,93 @@ def cmd_rag_query(args):
             print(f"   - {source.get('title', 'Unbekannt')}")
 
 
+def cmd_gitops_init(args):
+    """Initialize Git repository for documentation."""
+    from src.gitops import GitManager, GitConfig
+    from pathlib import Path
+    
+    config = GitConfig(
+        repo_path=Path(args.repo_path),
+        remote_url=args.remote_url or None,
+        branch=args.branch,
+        author_name=args.author_name,
+        author_email=args.author_email
+    )
+    
+    manager = GitManager(config)
+    print(f"✅ Git Repository initialisiert: {args.repo_path}")
+    
+    status = manager.status()
+    print(f"   Branch: {status.get('current_branch', 'N/A')}")
+
+
+def cmd_gitops_sync(args):
+    """Sync documentation to Git."""
+    from src.gitops import GitManager, GitConfig, RepositorySync, SyncConfig
+    from pathlib import Path
+    
+    git_config = GitConfig(repo_path=Path(args.repo_path))
+    git_manager = GitManager(git_config)
+    
+    sync_config = SyncConfig(auto_sync=True)
+    sync = RepositorySync(git_manager, sync_config)
+    
+    # Get files to sync
+    if args.files:
+        files = args.files.split(",")
+    else:
+        # Auto-detect changed files
+        status = git_manager.status()
+        files = status.get("modified_files", []) + status.get("untracked_files", [])
+    
+    if not files:
+        print("⚠️  Keine Dateien zum Synchronisieren gefunden")
+        return
+    
+    result = sync.sync_to_git(files, commit_message=args.message)
+    
+    if result:
+        print(f"✅ {len(files)} Dateien synchronisiert")
+        if args.push:
+            if git_manager.push():
+                print("✅ Zu Remote gepusht")
+    else:
+        print("❌ Synchronisation fehlgeschlagen")
+
+
+def cmd_gitops_status(args):
+    """Show Git repository status."""
+    from src.gitops import GitManager, GitConfig
+    from pathlib import Path
+    
+    git_config = GitConfig(repo_path=Path(args.repo_path))
+    git_manager = GitManager(git_config)
+    
+    status = git_manager.status()
+    sync_status = None
+    
+    if args.sync:
+        from src.gitops import RepositorySync
+        sync = RepositorySync(git_manager)
+        sync_status = sync.get_sync_status()
+    
+    print("\n📊 Git Repository Status")
+    print("=" * 40)
+    print(f"Branch: {status.get('current_branch', 'N/A')}")
+    print(f"Last Commit: {status.get('last_commit', 'Keine Commits')}")
+    print(f"Modified: {len(status.get('modified_files', []))}")
+    print(f"Untracked: {len(status.get('untracked_files', []))}")
+    print(f"Is Dirty: {status.get('is_dirty', False)}")
+    
+    if sync_status:
+        print("\n📡 Sync Status")
+        print("=" * 40)
+        print(f"Last Sync: {sync_status.get('last_sync', 'Nie')}")
+        print(f"Last Pull: {sync_status.get('last_pull', 'Nie')}")
+        print(f"Last Push: {sync_status.get('last_push', 'Nie')}")
+        print(f"Pending Changes: {sync_status.get('pending_changes', 0)}")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="AHG Innovation Features CLI",
@@ -248,6 +335,11 @@ Beispiele:
   
   # RAG-Abfrage
   python cli/innovation_cli.py rag query "Wie erstelle ich einen Benutzer?"
+  
+  # GitOps
+  python cli/innovation_cli.py gitops init -p ./docs --remote-url https://github.com/user/repo.git
+  python cli/innovation_cli.py gitops sync -p ./docs --push
+  python cli/innovation_cli.py gitops status -p ./docs
 """
     )
     
@@ -326,6 +418,33 @@ Beispiele:
     rag_query.add_argument("--storage", "-s", help="KB Speicherort")
     rag_query.add_argument("--lang", "-l", default="de", help="Sprache (de/en)")
     rag_query.set_defaults(func=cmd_rag_query)
+    
+    # GitOps commands
+    gitops_parser = subparsers.add_parser("gitops", help="GitOps Documentation Pipeline")
+    gitops_sub = gitops_parser.add_subparsers(dest="gitops_command")
+    
+    # gitops init
+    gitops_init = gitops_sub.add_parser("init", help="Git Repository initialisieren")
+    gitops_init.add_argument("--repo-path", "-p", required=True, help="Repository-Pfad")
+    gitops_init.add_argument("--remote-url", "-r", help="Remote URL")
+    gitops_init.add_argument("--branch", "-b", default="main", help="Branch")
+    gitops_init.add_argument("--author-name", default="AHG Documentation Tool", help="Autor Name")
+    gitops_init.add_argument("--author-email", default="ahg@example.com", help="Autor E-Mail")
+    gitops_init.set_defaults(func=cmd_gitops_init)
+    
+    # gitops sync
+    gitops_sync = gitops_sub.add_parser("sync", help="Zu Git synchronisieren")
+    gitops_sync.add_argument("--repo-path", "-p", required=True, help="Repository-Pfad")
+    gitops_sync.add_argument("--files", "-f", help="Dateien (kommasepariert)")
+    gitops_sync.add_argument("--message", "-m", help="Commit-Message")
+    gitops_sync.add_argument("--push", action="store_true", help="Nach Commit pushen")
+    gitops_sync.set_defaults(func=cmd_gitops_sync)
+    
+    # gitops status
+    gitops_status = gitops_sub.add_parser("status", help="Repository-Status anzeigen")
+    gitops_status.add_argument("--repo-path", "-p", required=True, help="Repository-Pfad")
+    gitops_status.add_argument("--sync", "-s", action="store_true", help="Sync-Status anzeigen")
+    gitops_status.set_defaults(func=cmd_gitops_status)
     
     args = parser.parse_args()
     
