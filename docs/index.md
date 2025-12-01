@@ -31,6 +31,17 @@
 - [Developer Manual](./DEVELOPER_MANUAL.md) - Architecture, API reference, and development guidelines
 - [Technical Writer Guide](./TECHNICAL_WRITER_GUIDE.md) - Guide for creating documentation with this tool
 
+### Innovation Features v3.0 Documentation
+
+- [API Gateway User Guide](./API_GATEWAY_USER_GUIDE.md) - Complete REST/GraphQL API documentation
+- [Plugin System Developer Guide](./PLUGIN_SYSTEM_DEVELOPER_GUIDE.md) - Plugin development and marketplace guide
+- [Edge AI User Guide](./EDGE_AI_USER_GUIDE.md) - On-device AI processing guide
+- [Blockchain Audit Trail Guide](./BLOCKCHAIN_AUDIT_TRAIL_GUIDE.md) - Immutable document verification
+- [Predictive Maintenance Guide](./PREDICTIVE_MAINTENANCE_GUIDE.md) - AI-powered documentation maintenance
+- [Multi-Modal Capture Guide](./MULTIMODAL_CAPTURE_GUIDE.md) - Video, audio, and sensor data capture
+- [AR Documentation Guide](./AR_DOCUMENTATION_GUIDE.md) - Mixed Reality overlay documentation
+- [v3.0 Features Quick Reference](./V3_FEATURES_QUICK_REFERENCE.md) - Quick reference for all v3.0 features
+
 ### Supporting Documentation
 
 - [Workflow Status](./bmm-workflow-status.yaml) - BMM workflow tracking
