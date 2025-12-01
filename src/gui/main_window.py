@@ -34,6 +34,13 @@ from src.gui.video_synthesis_dialog import VideoSynthesisDialog
 from src.gui.translation_dialog import TranslationDialog
 from src.gui.collaboration_dialog import CollaborationDialog
 from src.gui.agent_dialog import AgentDialog
+from src.gui.api_dialog import APIDialog
+from src.gui.plugin_dialog import PluginDialog
+from src.gui.edge_ai_dialog import EdgeAIDialog
+from src.gui.blockchain_dialog import BlockchainDialog
+from src.gui.predictive_dialog import PredictiveDialog
+from src.gui.multimodal_dialog import MultiModalDialog
+from src.gui.ar_dialog import ARDialog
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -146,6 +153,14 @@ class MainWindow:
         innovation_menu.add_command(label="🌐 Translation Hub...", command=self._show_translation_dialog, accelerator="Ctrl+Alt+T")
         innovation_menu.add_command(label="👥 Collaboration Hub...", command=self._show_collaboration_dialog, accelerator="Ctrl+Alt+C")
         innovation_menu.add_command(label="🤖 Autonomous Agent...", command=self._show_agent_dialog, accelerator="Ctrl+Alt+B")
+        innovation_menu.add_separator()
+        innovation_menu.add_command(label="🔌 API Gateway...", command=self._show_api_dialog, accelerator="Ctrl+Alt+Shift+A")
+        innovation_menu.add_command(label="🔌 Plugin System...", command=self._show_plugin_dialog, accelerator="Ctrl+Alt+Shift+P")
+        innovation_menu.add_command(label="⚡ Edge AI Engine...", command=self._show_edge_ai_dialog, accelerator="Ctrl+Alt+Shift+E")
+        innovation_menu.add_command(label="🔗 Blockchain Audit...", command=self._show_blockchain_dialog, accelerator="Ctrl+Alt+Shift+B")
+        innovation_menu.add_command(label="🔮 Predictive Maintenance...", command=self._show_predictive_dialog, accelerator="Ctrl+Alt+Shift+M")
+        innovation_menu.add_command(label="🎥 Multi-Modal Capture...", command=self._show_multimodal_dialog, accelerator="Ctrl+Alt+Shift+U")
+        innovation_menu.add_command(label="🥽 AR Documentation...", command=self._show_ar_dialog, accelerator="Ctrl+Alt+Shift+R")
     
     def _show_shortcuts(self):
         """Zeigt Dialog mit Tastenkürzeln"""
@@ -258,6 +273,27 @@ Für weitere Informationen siehe README.md
         
         # Ctrl+Alt+B: Autonomous Agent
         self.root.bind('<Control-Alt-b>', lambda e: self._show_agent_dialog())
+        
+        # Ctrl+Alt+Shift+A: API Gateway
+        self.root.bind('<Control-Alt-Shift-a>', lambda e: self._show_api_dialog())
+        
+        # Ctrl+Alt+Shift+P: Plugin System
+        self.root.bind('<Control-Alt-Shift-p>', lambda e: self._show_plugin_dialog())
+        
+        # Ctrl+Alt+Shift+E: Edge AI
+        self.root.bind('<Control-Alt-Shift-e>', lambda e: self._show_edge_ai_dialog())
+        
+        # Ctrl+Alt+Shift+B: Blockchain
+        self.root.bind('<Control-Alt-Shift-b>', lambda e: self._show_blockchain_dialog())
+        
+        # Ctrl+Alt+Shift+M: Predictive Maintenance
+        self.root.bind('<Control-Alt-Shift-m>', lambda e: self._show_predictive_dialog())
+        
+        # Ctrl+Alt+Shift+U: Multi-Modal Capture
+        self.root.bind('<Control-Alt-Shift-u>', lambda e: self._show_multimodal_dialog())
+        
+        # Ctrl+Alt+Shift+R: AR Documentation
+        self.root.bind('<Control-Alt-Shift-r>', lambda e: self._show_ar_dialog())
         
         # Ctrl+T: Qualitätsprüfung öffnen
         self.root.bind('<Control-t>', lambda e: self._show_quality_check())

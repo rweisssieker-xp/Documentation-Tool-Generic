@@ -575,6 +575,184 @@ def cmd_a11y_report(args):
     print(f"Score: {report.score:.1f}%")
 
 
+def cmd_api_start(args):
+    """Start API server"""
+    from src.api import APIGateway
+    
+    gateway = APIGateway()
+    print(f"Starting API Gateway on {args.host}:{args.port}...")
+    print(f"OpenAPI Spec: http://{args.host}:{args.port}/openapi.json")
+    gateway.run(host=args.host, port=args.port)
+
+
+def cmd_plugin_load(args):
+    """Load plugin"""
+    from src.plugins import PluginManager
+    
+    manager = PluginManager()
+    success = manager.load_plugin(args.path)
+    
+    if success:
+        print(f"Plugin loaded: {args.path}")
+    else:
+        print(f"Failed to load plugin: {args.path}")
+
+
+def cmd_plugin_list(args):
+    """List plugins"""
+    from src.plugins import PluginManager
+    
+    manager = PluginManager()
+    manager.load_all_plugins()
+    plugins = manager.list_plugins()
+    
+    print(f"\nLoaded Plugins: {len(plugins)}\n")
+    for plugin in plugins:
+        metadata = plugin.get('metadata', {})
+        print(f"  ID: {plugin.get('id')}")
+        print(f"  Name: {metadata.get('name', 'Unknown')}")
+        print(f"  Version: {metadata.get('version', '1.0.0')}")
+        print(f"  Status: {'Loaded' if plugin.get('loaded') else 'Not Loaded'}")
+        print()
+
+
+def cmd_plugin_unload(args):
+    """Unload plugin"""
+    from src.plugins import PluginManager
+    
+    manager = PluginManager()
+    success = manager.unload_plugin(args.id)
+    
+    if success:
+        print(f"Plugin unloaded: {args.id}")
+    else:
+        print(f"Failed to unload plugin: {args.id}")
+
+
+def cmd_edgeai_init(args):
+    """Initialize Edge AI"""
+    from src.edge_ai import EdgeAIEngine, ModelType
+    
+    model_type = ModelType.LLAMA if args.model == "llama" else ModelType.MISTRAL
+    engine = EdgeAIEngine(model_type=model_type, model_path=args.path)
+    
+    if engine.is_available():
+        print(f"Edge AI Engine initialized: {args.model}")
+    else:
+        print(f"Edge AI Engine initialized but models not available")
+
+
+def cmd_edgeai_generate(args):
+    """Generate text with Edge AI"""
+    from src.edge_ai import EdgeAIEngine, ModelType
+    
+    engine = EdgeAIEngine(model_type=ModelType.LLAMA)
+    
+    if not engine.is_available():
+        print("Error: Edge AI not available")
+        return
+    
+    try:
+        generated = engine.generate_text(args.prompt, max_tokens=args.tokens)
+        print(f"\nGenerated Text:\n{generated}\n")
+    except Exception as e:
+        print(f"Error: {e}")
+
+
+def cmd_blockchain_init(args):
+    """Initialize blockchain"""
+    from src.blockchain import BlockchainAuditTrail, BlockchainType
+    
+    chain_type = BlockchainType.ETHEREUM if args.chain == "ethereum" else BlockchainType.POLYGON
+    blockchain = BlockchainAuditTrail(blockchain_type=chain_type)
+    
+    print(f"Blockchain initialized: {args.chain}")
+
+
+def cmd_blockchain_store(args):
+    """Store document hash on blockchain"""
+    from src.blockchain import BlockchainAuditTrail, BlockchainType
+    from pathlib import Path
+    
+    blockchain = BlockchainAuditTrail(blockchain_type=BlockchainType.POLYGON)
+    
+    file_path = Path(args.file)
+    if not file_path.exists():
+        print(f"Error: File not found: {args.file}")
+        return
+    
+    with open(file_path, 'rb') as f:
+        content = f.read()
+    
+    doc_hash = blockchain.create_document_hash(content)
+    tx_hash = blockchain.store_hash(doc_hash)
+    
+    print(f"\nDocument Hash: {doc_hash}")
+    print(f"Transaction Hash: {tx_hash}\n")
+
+
+def cmd_blockchain_verify(args):
+    """Verify document against blockchain"""
+    from src.blockchain import BlockchainAuditTrail, BlockchainType
+    from pathlib import Path
+    
+    blockchain = BlockchainAuditTrail(blockchain_type=BlockchainType.POLYGON)
+    
+    file_path = Path(args.file)
+    if not file_path.exists():
+        print(f"Error: File not found: {args.file}")
+        return
+    
+    with open(file_path, 'rb') as f:
+        content = f.read()
+    
+    doc_hash = blockchain.create_document_hash(content)
+    is_valid = blockchain.verify_hash(doc_hash, args.tx)
+    
+    print(f"\nDocument Hash: {doc_hash}")
+    print(f"Transaction Hash: {args.tx}")
+    print(f"Verification: {'VALID' if is_valid else 'INVALID'}\n")
+
+
+def cmd_predictive_analyze(args):
+    """Analyze session for outdated documentation"""
+    from src.predictive import PredictiveMaintenanceEngine
+    
+    engine = PredictiveMaintenanceEngine()
+    issues = engine.analyze_documentation(args.session)
+    
+    print(f"\nAnalysis Results for Session: {args.session}")
+    print(f"Found {len(issues)} issues\n")
+    
+    for i, issue in enumerate(issues, 1):
+        print(f"{i}. [{issue.get('type', 'unknown')}] Priority: {issue.get('priority', 0):.1f}")
+        print(f"   {issue.get('description', 'No description')}\n")
+
+
+def cmd_multimodal_start(args):
+    """Start multi-modal recording"""
+    from src.multimodal import MultiModalCaptureEngine
+    
+    engine = MultiModalCaptureEngine()
+    engine.start_recording(args.output)
+    
+    print(f"Multi-modal recording started: {args.output}")
+    print("Press Ctrl+C or run 'multimodal stop' to stop recording")
+
+
+def cmd_multimodal_stop(args):
+    """Stop multi-modal recording"""
+    from src.multimodal import MultiModalCaptureEngine
+    
+    engine = MultiModalCaptureEngine()
+    synchronized = engine.stop_recording()
+    
+    print(f"\nRecording stopped")
+    print(f"Synchronized streams: {len(synchronized)}\n")
+    for stream_type, stream_data in synchronized.items():
+        print(f"  {stream_type}: {stream_data.get('path', 'N/A')}")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="AHG Innovation Features CLI",
@@ -826,6 +1004,80 @@ Beispiele:
     a11y_report.add_argument("--format", choices=["json", "html"], default="html", help="Format")
     a11y_report.add_argument("--output", "-o", help="Ausgabedatei")
     a11y_report.set_defaults(func=cmd_a11y_report)
+    
+    # API Gateway commands
+    api_parser = subparsers.add_parser("api", help="API-First Gateway")
+    api_sub = api_parser.add_subparsers(dest="api_command")
+    
+    api_start = api_sub.add_parser("start", help="Start API server")
+    api_start.add_argument("--port", "-p", type=int, default=8000, help="Port")
+    api_start.add_argument("--host", default="0.0.0.0", help="Host")
+    api_start.set_defaults(func=cmd_api_start)
+    
+    # Plugin System commands
+    plugin_parser = subparsers.add_parser("plugin", help="Plugin System")
+    plugin_sub = plugin_parser.add_subparsers(dest="plugin_command")
+    
+    plugin_load = plugin_sub.add_parser("load", help="Load plugin")
+    plugin_load.add_argument("--path", "-p", required=True, help="Plugin file path")
+    plugin_load.set_defaults(func=cmd_plugin_load)
+    
+    plugin_list = plugin_sub.add_parser("list", help="List plugins")
+    plugin_list.set_defaults(func=cmd_plugin_list)
+    
+    plugin_unload = plugin_sub.add_parser("unload", help="Unload plugin")
+    plugin_unload.add_argument("--id", "-i", required=True, help="Plugin ID")
+    plugin_unload.set_defaults(func=cmd_plugin_unload)
+    
+    # Edge AI commands
+    edgeai_parser = subparsers.add_parser("edgeai", help="Edge AI Engine")
+    edgeai_sub = edgeai_parser.add_subparsers(dest="edgeai_command")
+    
+    edgeai_init = edgeai_sub.add_parser("init", help="Initialize Edge AI")
+    edgeai_init.add_argument("--model", "-m", default="llama", choices=["llama", "mistral"], help="Model type")
+    edgeai_init.add_argument("--path", "-p", help="Model path")
+    edgeai_init.set_defaults(func=cmd_edgeai_init)
+    
+    edgeai_generate = edgeai_sub.add_parser("generate", help="Generate text")
+    edgeai_generate.add_argument("--prompt", "-p", required=True, help="Prompt")
+    edgeai_generate.add_argument("--tokens", "-t", type=int, default=200, help="Max tokens")
+    edgeai_generate.set_defaults(func=cmd_edgeai_generate)
+    
+    # Blockchain commands
+    blockchain_parser = subparsers.add_parser("blockchain", help="Blockchain Audit Trail")
+    blockchain_sub = blockchain_parser.add_subparsers(dest="blockchain_command")
+    
+    blockchain_init = blockchain_sub.add_parser("init", help="Initialize blockchain")
+    blockchain_init.add_argument("--chain", "-c", default="polygon", choices=["ethereum", "polygon"], help="Blockchain")
+    blockchain_init.set_defaults(func=cmd_blockchain_init)
+    
+    blockchain_store = blockchain_sub.add_parser("store", help="Store document hash")
+    blockchain_store.add_argument("--file", "-f", required=True, help="Document file")
+    blockchain_store.set_defaults(func=cmd_blockchain_store)
+    
+    blockchain_verify = blockchain_sub.add_parser("verify", help="Verify document")
+    blockchain_verify.add_argument("--file", "-f", required=True, help="Document file")
+    blockchain_verify.add_argument("--tx", "-t", required=True, help="Transaction hash")
+    blockchain_verify.set_defaults(func=cmd_blockchain_verify)
+    
+    # Predictive Maintenance commands
+    predictive_parser = subparsers.add_parser("predictive", help="Predictive Maintenance")
+    predictive_sub = predictive_parser.add_subparsers(dest="predictive_command")
+    
+    predictive_analyze = predictive_sub.add_parser("analyze", help="Analyze session")
+    predictive_analyze.add_argument("--session", "-s", required=True, help="Session ID")
+    predictive_analyze.set_defaults(func=cmd_predictive_analyze)
+    
+    # Multi-Modal commands
+    multimodal_parser = subparsers.add_parser("multimodal", help="Multi-Modal Capture")
+    multimodal_sub = multimodal_parser.add_subparsers(dest="multimodal_command")
+    
+    multimodal_start = multimodal_sub.add_parser("start", help="Start recording")
+    multimodal_start.add_argument("--output", "-o", required=True, help="Output directory")
+    multimodal_start.set_defaults(func=cmd_multimodal_start)
+    
+    multimodal_stop = multimodal_sub.add_parser("stop", help="Stop recording")
+    multimodal_stop.set_defaults(func=cmd_multimodal_stop)
     
     args = parser.parse_args()
     

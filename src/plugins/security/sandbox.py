@@ -2,7 +2,7 @@
 Sandbox Executor - Sicherer Plugin-Execution
 """
 
-from typing import Any, Optional
+from typing import Any, Optional, Dict
 import sys
 import importlib.util
 
