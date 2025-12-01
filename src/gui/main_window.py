@@ -28,6 +28,8 @@ from src.gui.exploration_progress_dialog import ExplorationProgressDialog
 from src.gui.progress_dialog import ProgressDialog
 from src.gui.platform_export_dialog import PlatformExportDialog
 from src.gui.gitops_dialog import GitOpsDialog
+from src.gui.accessibility_dialog import AccessibilityDialog
+from src.gui.roi_dashboard import ROIDashboard
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -133,6 +135,8 @@ class MainWindow:
         innovation_menu.add_command(label="🔎 Process Mining...", command=self._show_process_mining)
         innovation_menu.add_separator()
         innovation_menu.add_command(label="🔧 GitOps Pipeline...", command=self._show_gitops_dialog, accelerator="Ctrl+Alt+G")
+        innovation_menu.add_command(label="♿ Accessibility Check...", command=self._show_accessibility_dialog, accelerator="Ctrl+Alt+A")
+        innovation_menu.add_command(label="📊 ROI Dashboard...", command=self._show_roi_dashboard, accelerator="Ctrl+Alt+R")
     
     def _show_shortcuts(self):
         """Zeigt Dialog mit Tastenkürzeln"""
@@ -230,6 +234,12 @@ Für weitere Informationen siehe README.md
         
         # Ctrl+Alt+G: GitOps Dialog
         self.root.bind('<Control-Alt-g>', lambda e: self._show_gitops_dialog())
+        
+        # Ctrl+Alt+A: Accessibility Dialog
+        self.root.bind('<Control-Alt-a>', lambda e: self._show_accessibility_dialog())
+        
+        # Ctrl+Alt+R: ROI Dashboard
+        self.root.bind('<Control-Alt-r>', lambda e: self._show_roi_dashboard())
         
         # Ctrl+T: Qualitätsprüfung öffnen
         self.root.bind('<Control-t>', lambda e: self._show_quality_check())
@@ -1546,4 +1556,20 @@ Für weitere Informationen siehe README.md
         except Exception as e:
             logger.error(f"Fehler beim Öffnen des GitOps-Dialogs: {e}")
             messagebox.showerror("Fehler", f"Fehler beim Öffnen des GitOps-Dialogs:\n{e}")
+    
+    def _show_accessibility_dialog(self):
+        """Zeigt Accessibility Compliance Dialog"""
+        try:
+            dialog = AccessibilityDialog(self.root)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des Accessibility-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler beim Öffnen des Accessibility-Dialogs:\n{e}")
+    
+    def _show_roi_dashboard(self):
+        """Zeigt ROI Dashboard"""
+        try:
+            dashboard = ROIDashboard(self.root)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des ROI-Dashboards: {e}")
+            messagebox.showerror("Fehler", f"Fehler beim Öffnen des ROI-Dashboards:\n{e}")
 
