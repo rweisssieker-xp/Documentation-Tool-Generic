@@ -37,8 +37,9 @@ class PolygonChain:
             raise RuntimeError("Polygon connection not available")
         
         # Placeholder implementation
+        import hashlib
         logger.info(f"Storing hash on Polygon: {document_hash[:16]}...")
-        return f"0x{hash(document_hash).hexdigest()[:64]}"
+        return f"0x{hashlib.sha256(document_hash.encode()).hexdigest()[:64]}"
     
     def get_hash(self, tx_hash: str) -> Optional[str]:
         """Get hash from Polygon"""

@@ -2,7 +2,7 @@
 Blockchain Audit Trail - Zentrale Blockchain-Integration
 """
 
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from enum import Enum
 import hashlib
 
@@ -72,6 +72,12 @@ class BlockchainAuditTrail:
             logger.error(f"Error storing hash: {e}")
             raise
     
+    def batch_store(self, hashes: List[str]) -> str:
+        """Batch store multiple hashes using Merkle Tree"""
+        merkle_root = self.merkle_tree.create_tree(hashes)
+        tx_hash = self.store_hash(merkle_root, {"type": "merkle_root", "count": len(hashes)})
+        return tx_hash
+    
     def verify_hash(self, document_hash: str, tx_hash: str) -> bool:
         """Verify document hash on blockchain"""
         if not self.chain:
@@ -87,10 +93,4 @@ class BlockchainAuditTrail:
     def create_document_hash(self, document_content: bytes) -> str:
         """Create SHA-256 hash of document"""
         return hashlib.sha256(document_content).hexdigest()
-    
-    def batch_store(self, hashes: list) -> str:
-        """Batch store multiple hashes using Merkle Tree"""
-        merkle_root = self.merkle_tree.create_tree(hashes)
-        tx_hash = self.store_hash(merkle_root, {"type": "merkle_root", "count": len(hashes)})
-        return tx_hash
 

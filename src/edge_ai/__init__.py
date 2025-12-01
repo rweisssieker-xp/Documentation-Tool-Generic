@@ -2,7 +2,7 @@
 Edge AI Engine - On-Device AI ohne Cloud
 """
 
-from .engine import EdgeAIEngine
+from .engine import EdgeAIEngine, ModelType
 from .llm.llama import LlamaLLM
 from .llm.mistral import MistralLLM
 from .whisper.local_whisper import LocalWhisper
@@ -11,6 +11,7 @@ from .models.manager import ModelManager
 
 __all__ = [
     'EdgeAIEngine',
+    'ModelType',
     'LlamaLLM',
     'MistralLLM',
     'LocalWhisper',

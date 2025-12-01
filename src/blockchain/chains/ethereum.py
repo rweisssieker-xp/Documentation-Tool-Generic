@@ -38,8 +38,9 @@ class EthereumChain:
         
         # Placeholder implementation
         # In production, this would interact with a smart contract
+        import hashlib
         logger.info(f"Storing hash on Ethereum: {document_hash[:16]}...")
-        return f"0x{hash(document_hash).hexdigest()[:64]}"
+        return f"0x{hashlib.sha256(document_hash.encode()).hexdigest()[:64]}"
     
     def get_hash(self, tx_hash: str) -> Optional[str]:
         """Get hash from Ethereum"""

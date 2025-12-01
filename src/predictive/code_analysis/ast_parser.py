@@ -2,7 +2,7 @@
 AST Parser - Analysiert Code-Struktur
 """
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import ast
 
 from src.utils.logger import get_logger
