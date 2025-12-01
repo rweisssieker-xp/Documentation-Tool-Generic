@@ -35,7 +35,7 @@ class TestStepPredictor:
         """Test prediction with learned patterns."""
         from src.prediction.step_predictor import StepPredictor
         
-        predictor = StepPredictor(model_dir=str(tmp_path), min_pattern_frequency=1)
+        predictor = StepPredictor(model_dir=str(tmp_path))
         
         # Learn a pattern
         session_steps = [

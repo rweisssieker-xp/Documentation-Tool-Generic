@@ -50,8 +50,8 @@ class TestTutorialGenerator:
             title="Test Tutorial",
             description="A test tutorial",
             steps=[
-                TutorialStep(id="s1", title="Step 1", content="First step"),
-                TutorialStep(id="s2", title="Step 2", content="Second step")
+                TutorialStep(id="s1", title="Step 1", content="First step", screenshot=None),
+                TutorialStep(id="s2", title="Step 2", content="Second step", screenshot=None)
             ],
             prerequisites=["Basic knowledge"],
             learning_objectives=["Learn basics"],
@@ -132,7 +132,7 @@ class TestSCORMExporter:
             id="tut_001",
             title="Test Tutorial",
             description="Description",
-            steps=[TutorialStep(id="s1", title="Step 1", content="Content")],
+            steps=[TutorialStep(id="s1", title="Step 1", content="Content", screenshot=None)],
             prerequisites=[],
             learning_objectives=[],
             difficulty="Anfänger",
