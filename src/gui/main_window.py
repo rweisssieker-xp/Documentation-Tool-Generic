@@ -1667,4 +1667,67 @@ Für weitere Informationen siehe README.md
         except Exception as e:
             logger.error(f"Fehler beim Öffnen des Agent-Dialogs: {e}")
             messagebox.showerror("Fehler", f"Fehler: {e}")
+    
+    def _show_api_dialog(self):
+        """Zeigt API Gateway Dialog"""
+        try:
+            dialog = APIDialog(self.root)
+            self.root.wait_window(dialog.dialog)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des API-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler beim Öffnen des API-Dialogs:\n{e}")
+    
+    def _show_plugin_dialog(self):
+        """Zeigt Plugin System Dialog"""
+        try:
+            dialog = PluginDialog(self.root)
+            self.root.wait_window(dialog.dialog)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des Plugin-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler beim Öffnen des Plugin-Dialogs:\n{e}")
+    
+    def _show_edge_ai_dialog(self):
+        """Zeigt Edge AI Engine Dialog"""
+        try:
+            dialog = EdgeAIDialog(self.root)
+            self.root.wait_window(dialog.dialog)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des Edge AI-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler beim Öffnen des Edge AI-Dialogs:\n{e}")
+    
+    def _show_blockchain_dialog(self):
+        """Zeigt Blockchain Audit Trail Dialog"""
+        try:
+            dialog = BlockchainDialog(self.root)
+            self.root.wait_window(dialog.dialog)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des Blockchain-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler beim Öffnen des Blockchain-Dialogs:\n{e}")
+    
+    def _show_predictive_dialog(self):
+        """Zeigt Predictive Maintenance Dialog"""
+        try:
+            dialog = PredictiveDialog(self.root)
+            self.root.wait_window(dialog.dialog)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des Predictive-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler beim Öffnen des Predictive-Dialogs:\n{e}")
+    
+    def _show_multimodal_dialog(self):
+        """Zeigt Multi-Modal Capture Dialog"""
+        try:
+            dialog = MultiModalDialog(self.root)
+            self.root.wait_window(dialog.dialog)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des Multi-Modal-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler beim Öffnen des Multi-Modal-Dialogs:\n{e}")
+    
+    def _show_ar_dialog(self):
+        """Zeigt AR Documentation Dialog"""
+        try:
+            dialog = ARDialog(self.root)
+            self.root.wait_window(dialog.dialog)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des AR-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler beim Öffnen des AR-Dialogs:\n{e}")
 

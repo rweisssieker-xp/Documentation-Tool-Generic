@@ -180,3 +180,4 @@ class ARDialog:
             messagebox.showerror("Error", f"Failed to hide overlay: {e}")
 
 
+

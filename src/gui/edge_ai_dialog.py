@@ -150,3 +150,4 @@ class EdgeAIDialog:
             messagebox.showerror("Error", f"Failed to generate text: {e}")
 
 
+

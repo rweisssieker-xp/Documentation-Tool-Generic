@@ -81,3 +81,4 @@ class TestBasePlugin:
         assert info['name'] == 'Test Plugin'
 
 
+
