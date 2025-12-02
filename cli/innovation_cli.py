@@ -753,6 +753,82 @@ def cmd_multimodal_stop(args):
         print(f"  {stream_type}: {stream_data.get('path', 'N/A')}")
 
 
+def cmd_selflearning_learn(args):
+    """Lernen aus Interaktion"""
+    from src.self_learning import SelfLearningEngine
+    engine = SelfLearningEngine()
+    data = json.loads(args.data) if args.data.startswith('{') else {'type': args.data}
+    result = engine.learn_from_interaction(data)
+    print(f"✅ Learning: {result}")
+
+def cmd_selflearning_save(args):
+    """Models speichern"""
+    from src.self_learning import SelfLearningEngine
+    engine = SelfLearningEngine()
+    result = engine.save_models()
+    print(f"✅ Models saved: {result}")
+
+def cmd_agentic_execute(args):
+    """Agentic Task ausführen"""
+    from src.agentic import AgentOrchestrator
+    orchestrator = AgentOrchestrator()
+    task_data = json.loads(args.data) if args.data else {'type': 'generate'}
+    result = orchestrator.execute_task(args.type, task_data)
+    print(f"✅ Task executed: {result}")
+
+def cmd_hyperautomation_execute(args):
+    """Hyperautomation Workflow ausführen"""
+    from src.hyperautomation import WorkflowOrchestrator
+    orchestrator = WorkflowOrchestrator()
+    result = orchestrator.execute_workflow(args.workflow, {})
+    print(f"✅ Workflow executed: {result}")
+
+def cmd_localization_translate(args):
+    """AI Localization übersetzen"""
+    from src.localization import TranslationEngine
+    engine = TranslationEngine()
+    result = engine.translate(args.text, args.target)
+    print(f"✅ Translation: {result}")
+
+def cmd_compliance_check(args):
+    """Compliance prüfen"""
+    from src.compliance import ComplianceEngine
+    engine = ComplianceEngine()
+    standards = args.standards.split(',') if args.standards else ['GDPR']
+    content = Path(args.file).read_text()
+    result = engine.check_compliance(content, standards)
+    print(f"✅ Compliance: {result['compliant']}, Score: {result['score']}")
+
+def cmd_adaptiveux_adapt(args):
+    """Adaptive UX anpassen"""
+    from src.adaptive_ux import AdaptiveUXEngine
+    engine = AdaptiveUXEngine()
+    result = engine.adapt_ui(args.user, {})
+    print(f"✅ UI adapted: {result}")
+
+def cmd_predworkflow_predict(args):
+    """Predictive Workflow vorhersagen"""
+    from src.predictive_workflow import PredictiveWorkflowAutomator
+    automator = PredictiveWorkflowAutomator()
+    context = json.loads(args.context) if args.context else {}
+    result = automator.predict_next_action(context)
+    print(f"✅ Next action: {result}")
+
+def cmd_datahub_connect(args):
+    """Data Hub System verbinden"""
+    from src.data_hub import UniversalDataHub
+    hub = UniversalDataHub()
+    config = json.loads(args.config) if args.config else {}
+    result = hub.connect_system(args.type, config)
+    print(f"✅ System connected: {result}")
+
+def cmd_assistant_help(args):
+    """Intelligent Assistant Hilfe"""
+    from src.intelligent_assistant import IntelligentDocumentationAssistant
+    assistant = IntelligentDocumentationAssistant("user")
+    result = assistant.help(args.question)
+    print(f"✅ Answer: {result}")
+
 def main():
     parser = argparse.ArgumentParser(
         description="AHG Innovation Features CLI",
@@ -997,6 +1073,85 @@ Beispiele:
     a11y_fix = a11y_sub.add_parser("fix", help="Automatisch korrigieren")
     a11y_fix.add_argument("--file", "-f", required=True, help="HTML-Datei")
     a11y_fix.add_argument("--auto", action="store_true", help="Automatisch korrigieren")
+    
+    # Self-Learning AI commands
+    selflearning_parser = subparsers.add_parser("selflearning", help="Self-Learning AI Engine")
+    selflearning_sub = selflearning_parser.add_subparsers(dest="selflearning_command")
+    
+    selflearning_learn = selflearning_sub.add_parser("learn", help="Lernen aus Interaktion")
+    selflearning_learn.add_argument("--data", "-d", required=True, help="Interaktions-Daten")
+    selflearning_learn.set_defaults(func=cmd_selflearning_learn)
+    
+    selflearning_save = selflearning_sub.add_parser("save", help="Models speichern")
+    selflearning_save.set_defaults(func=cmd_selflearning_save)
+    
+    # Agentic commands
+    agentic_parser = subparsers.add_parser("agentic", help="Agentic Documentation Automation")
+    agentic_sub = agentic_parser.add_subparsers(dest="agentic_command")
+    
+    agentic_execute = agentic_sub.add_parser("execute", help="Task ausführen")
+    agentic_execute.add_argument("--type", "-t", required=True, help="Task-Typ")
+    agentic_execute.add_argument("--data", "-d", help="Task-Daten")
+    agentic_execute.set_defaults(func=cmd_agentic_execute)
+    
+    # Hyperautomation commands
+    hyperauto_parser = subparsers.add_parser("hyperautomation", help="Hyperautomation Engine")
+    hyperauto_sub = hyperauto_parser.add_subparsers(dest="hyperauto_command")
+    
+    hyperauto_execute = hyperauto_sub.add_parser("execute", help="Workflow ausführen")
+    hyperauto_execute.add_argument("--workflow", "-w", required=True, help="Workflow-ID")
+    hyperauto_execute.set_defaults(func=cmd_hyperautomation_execute)
+    
+    # Localization commands
+    loc_parser = subparsers.add_parser("localization", help="AI Localization Hub")
+    loc_sub = loc_parser.add_subparsers(dest="loc_command")
+    
+    loc_translate = loc_sub.add_parser("translate", help="Übersetzen")
+    loc_translate.add_argument("--text", "-t", required=True, help="Text")
+    loc_translate.add_argument("--target", "-l", required=True, help="Zielsprache")
+    loc_translate.set_defaults(func=cmd_localization_translate)
+    
+    # Compliance commands
+    compliance_parser = subparsers.add_parser("compliance", help="Compliance Automation")
+    compliance_sub = compliance_parser.add_subparsers(dest="compliance_command")
+    
+    compliance_check = compliance_sub.add_parser("check", help="Compliance prüfen")
+    compliance_check.add_argument("--file", "-f", required=True, help="Datei")
+    compliance_check.add_argument("--standards", "-s", help="Standards (kommasepariert)")
+    compliance_check.set_defaults(func=cmd_compliance_check)
+    
+    # Adaptive UX commands
+    adaptiveux_parser = subparsers.add_parser("adaptiveux", help="Adaptive UX Engine")
+    adaptiveux_sub = adaptiveux_parser.add_subparsers(dest="adaptiveux_command")
+    
+    adaptiveux_adapt = adaptiveux_sub.add_parser("adapt", help="UI anpassen")
+    adaptiveux_adapt.add_argument("--user", "-u", required=True, help="User-ID")
+    adaptiveux_adapt.set_defaults(func=cmd_adaptiveux_adapt)
+    
+    # Predictive Workflow commands
+    predworkflow_parser = subparsers.add_parser("predworkflow", help="Predictive Workflow")
+    predworkflow_sub = predworkflow_parser.add_subparsers(dest="predworkflow_command")
+    
+    predworkflow_predict = predworkflow_sub.add_parser("predict", help="Nächste Aktion vorhersagen")
+    predworkflow_predict.add_argument("--context", "-c", help="Kontext")
+    predworkflow_predict.set_defaults(func=cmd_predworkflow_predict)
+    
+    # Data Hub commands
+    datahub_parser = subparsers.add_parser("datahub", help="Universal Data Hub")
+    datahub_sub = datahub_parser.add_subparsers(dest="datahub_command")
+    
+    datahub_connect = datahub_sub.add_parser("connect", help="System verbinden")
+    datahub_connect.add_argument("--type", "-t", required=True, help="System-Typ")
+    datahub_connect.add_argument("--config", "-c", help="Konfiguration")
+    datahub_connect.set_defaults(func=cmd_datahub_connect)
+    
+    # Intelligent Assistant commands
+    assistant_parser = subparsers.add_parser("assistant", help="Intelligent Assistant")
+    assistant_sub = assistant_parser.add_subparsers(dest="assistant_command")
+    
+    assistant_help = assistant_sub.add_parser("help", help="Hilfe anfordern")
+    assistant_help.add_argument("--question", "-q", required=True, help="Frage")
+    assistant_help.set_defaults(func=cmd_assistant_help)
     a11y_fix.set_defaults(func=cmd_a11y_fix)
     
     a11y_report = a11y_sub.add_parser("report", help="Report generieren")

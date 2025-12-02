@@ -41,6 +41,15 @@ from src.gui.blockchain_dialog import BlockchainDialog
 from src.gui.predictive_dialog import PredictiveDialog
 from src.gui.multimodal_dialog import MultiModalDialog
 from src.gui.ar_dialog import ARDialog
+from src.gui.self_learning_dialog import SelfLearningDialog
+from src.gui.agentic_dialog import AgenticDialog
+from src.gui.hyperautomation_dialog import HyperautomationDialog
+from src.gui.localization_dialog import LocalizationDialog
+from src.gui.compliance_dialog import ComplianceDialog
+from src.gui.adaptive_ux_dialog import AdaptiveUXDialog
+from src.gui.predictive_workflow_dialog import PredictiveWorkflowDialog
+from src.gui.data_hub_dialog import DataHubDialog
+from src.gui.intelligent_assistant_dialog import IntelligentAssistantDialog
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -161,6 +170,19 @@ class MainWindow:
         innovation_menu.add_command(label="🔮 Predictive Maintenance...", command=self._show_predictive_dialog, accelerator="Ctrl+Alt+Shift+M")
         innovation_menu.add_command(label="🎥 Multi-Modal Capture...", command=self._show_multimodal_dialog, accelerator="Ctrl+Alt+Shift+U")
         innovation_menu.add_command(label="🥽 AR Documentation...", command=self._show_ar_dialog, accelerator="Ctrl+Alt+Shift+R")
+        innovation_menu.add_separator()
+        innovation_menu.add_command(label="🧠 Self-Learning AI...", command=self._show_self_learning_dialog, accelerator="Ctrl+Alt+Shift+L")
+        innovation_menu.add_command(label="🤖 Agentic Automation...", command=self._show_agentic_dialog, accelerator="Ctrl+Alt+Shift+O")
+        innovation_menu.add_command(label="🔗 Federated Learning...", command=self._show_federated_dialog, accelerator="Ctrl+Alt+Shift+F")
+        innovation_menu.add_separator()
+        innovation_menu.add_command(label="⚙️ Hyperautomation...", command=self._show_hyperautomation_dialog, accelerator="Ctrl+Alt+Shift+H")
+        innovation_menu.add_command(label="🌍 AI Localization...", command=self._show_localization_dialog, accelerator="Ctrl+Alt+Shift+I")
+        innovation_menu.add_command(label="✅ Compliance Automation...", command=self._show_compliance_dialog, accelerator="Ctrl+Alt+Shift+N")
+        innovation_menu.add_separator()
+        innovation_menu.add_command(label="🎨 Adaptive UX...", command=self._show_adaptive_ux_dialog, accelerator="Ctrl+Alt+Shift+X")
+        innovation_menu.add_command(label="🔮 Predictive Workflow...", command=self._show_predictive_workflow_dialog, accelerator="Ctrl+Alt+Shift+W")
+        innovation_menu.add_command(label="🔌 Universal Data Hub...", command=self._show_data_hub_dialog, accelerator="Ctrl+Alt+Shift+D")
+        innovation_menu.add_command(label="💬 Intelligent Assistant...", command=self._show_intelligent_assistant_dialog, accelerator="Ctrl+Alt+Shift+S")
     
     def _show_shortcuts(self):
         """Zeigt Dialog mit Tastenkürzeln"""
@@ -1730,4 +1752,92 @@ Für weitere Informationen siehe README.md
         except Exception as e:
             logger.error(f"Fehler beim Öffnen des AR-Dialogs: {e}")
             messagebox.showerror("Fehler", f"Fehler beim Öffnen des AR-Dialogs:\n{e}")
+    
+    def _show_self_learning_dialog(self):
+        """Zeigt Self-Learning AI Dialog"""
+        try:
+            dialog = SelfLearningDialog(self.root)
+            self.root.wait_window(dialog.dialog)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des Self-Learning-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler beim Öffnen des Self-Learning-Dialogs:\n{e}")
+    
+    def _show_agentic_dialog(self):
+        """Zeigt Agentic Automation Dialog"""
+        try:
+            dialog = AgenticDialog(self.root)
+            self.root.wait_window(dialog.dialog)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des Agentic-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler beim Öffnen des Agentic-Dialogs:\n{e}")
+    
+    def _show_federated_dialog(self):
+        """Zeigt Federated Learning Dialog"""
+        try:
+            messagebox.showinfo("Federated Learning", "Federated Learning Network - Coming Soon")
+        except Exception as e:
+            logger.error(f"Fehler: {e}")
+    
+    def _show_hyperautomation_dialog(self):
+        """Zeigt Hyperautomation Dialog"""
+        try:
+            dialog = HyperautomationDialog(self.root)
+            self.root.wait_window(dialog.dialog)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des Hyperautomation-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler beim Öffnen des Hyperautomation-Dialogs:\n{e}")
+    
+    def _show_localization_dialog(self):
+        """Zeigt AI Localization Dialog"""
+        try:
+            dialog = LocalizationDialog(self.root)
+            self.root.wait_window(dialog.dialog)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des Localization-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler beim Öffnen des Localization-Dialogs:\n{e}")
+    
+    def _show_compliance_dialog(self):
+        """Zeigt Compliance Automation Dialog"""
+        try:
+            dialog = ComplianceDialog(self.root)
+            self.root.wait_window(dialog.dialog)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des Compliance-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler beim Öffnen des Compliance-Dialogs:\n{e}")
+    
+    def _show_adaptive_ux_dialog(self):
+        """Zeigt Adaptive UX Dialog"""
+        try:
+            dialog = AdaptiveUXDialog(self.root)
+            self.root.wait_window(dialog.dialog)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des Adaptive-UX-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler beim Öffnen des Adaptive-UX-Dialogs:\n{e}")
+    
+    def _show_predictive_workflow_dialog(self):
+        """Zeigt Predictive Workflow Dialog"""
+        try:
+            dialog = PredictiveWorkflowDialog(self.root)
+            self.root.wait_window(dialog.dialog)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des Predictive-Workflow-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler beim Öffnen des Predictive-Workflow-Dialogs:\n{e}")
+    
+    def _show_data_hub_dialog(self):
+        """Zeigt Universal Data Hub Dialog"""
+        try:
+            dialog = DataHubDialog(self.root)
+            self.root.wait_window(dialog.dialog)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des Data-Hub-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler beim Öffnen des Data-Hub-Dialogs:\n{e}")
+    
+    def _show_intelligent_assistant_dialog(self):
+        """Zeigt Intelligent Assistant Dialog"""
+        try:
+            dialog = IntelligentAssistantDialog(self.root)
+            self.root.wait_window(dialog.dialog)
+        except Exception as e:
+            logger.error(f"Fehler beim Öffnen des Intelligent-Assistant-Dialogs: {e}")
+            messagebox.showerror("Fehler", f"Fehler beim Öffnen des Intelligent-Assistant-Dialogs:\n{e}")
 
