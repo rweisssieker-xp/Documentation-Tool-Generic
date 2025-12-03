@@ -35,6 +35,20 @@ env/
 *.sublime-project
 *.sublime-workspace
 
+# IDE/Editor specific directories
+.agent/
+.bmad/
+.claude/
+.clinerules/
+.cursor/
+.gemini/
+.opencode/
+.qwen/
+.rovodev/
+.trae/
+.windsurf/
+.kilocodemodes
+
 # Environment Variables
 .env
 .env.local
