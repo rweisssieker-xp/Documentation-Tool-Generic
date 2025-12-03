@@ -1,7 +1,7 @@
 installation:
-  version: 6.0.0-alpha.12
-  installDate: '2025-11-28T05:18:57.458Z'
-  lastUpdated: '2025-11-28T05:18:57.458Z'
+  version: 6.0.0-alpha.13
+  installDate: '2025-12-03T04:53:22.405Z'
+  lastUpdated: '2025-12-03T04:53:22.405Z'
 modules:
   - core
   - bmm
@@ -15,3 +15,8 @@ ides:
   - antigravity
   - qwen
   - trae
+  - rovo-dev
+  - opencode
+  - cline
+  - kilo
+  - roo

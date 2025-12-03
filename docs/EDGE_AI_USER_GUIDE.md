@@ -427,3 +427,4 @@ vectors = embeddings.embed_batch(texts)
 
 
 
+
